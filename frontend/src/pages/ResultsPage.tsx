@@ -5,10 +5,19 @@ import { useGeneSearch } from "@/hooks/useGeneSearch";
 import { GeneTable } from "@/components/GeneTable";
 import { SkeletonTable } from "@/components/SkeletonTable";
 import { exportCSV } from "@/lib/export";
+import { FilterPanel } from "@/components/FilterPanel";
+import { VariantTable } from "@/components/VariantTable";
+import { useVariants } from "@/hooks/useVariants";
+import type { VariantFilters } from "@/types";
 
 export function ResultsPage() {
   const { query, data, isLoading, error } = useGeneSearch();
   const [activeTab, setActiveTab] = useState<"genes" | "variants">("genes");
+  const [filters, setFilters] = useState<VariantFilters>({});
+  const { data: variantData, isLoading: variantsLoading } = useVariants(
+    data?.genes ?? [],
+    filters,
+  );
 
   const handleExportGenes = () => {
     if (!data?.genes) return;
@@ -72,8 +81,21 @@ export function ResultsPage() {
       )}
       {data && activeTab === "genes" && <GeneTable genes={data.genes} />}
       {data && activeTab === "variants" && (
-        <div className="p-8 text-center bg-slate-50 rounded-xl text-slate-500">
-          Variant annotations loading — implemented in next task
+        <div className="flex gap-6">
+          <div className="w-64 flex-shrink-0">
+            <FilterPanel filters={filters} onChange={setFilters} />
+          </div>
+          <div className="flex-1">
+            {variantsLoading ? (
+              <SkeletonTable rows={10} cols={8} />
+            ) : variantData?.variants.length ? (
+              <VariantTable variants={variantData.variants} />
+            ) : (
+              <div className="p-8 text-center bg-slate-50 rounded-xl text-slate-500">
+                No variants found with current filters
+              </div>
+            )}
+          </div>
         </div>
       )}
     </motion.div>
