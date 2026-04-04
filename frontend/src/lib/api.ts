@@ -1,3 +1,5 @@
+import type { GeneSearchResult, VariantListResult, Variant, User, HistoryEntry } from "@/types";
+
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
 async function fetchAPI<T>(path: string, options?: RequestInit): Promise<T> {
@@ -13,20 +15,20 @@ async function fetchAPI<T>(path: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   searchGenes: (query: string) =>
-    fetchAPI<import("@/types").GeneSearchResult>(`/api/genes/search?q=${encodeURIComponent(query)}`),
+    fetchAPI<GeneSearchResult>(`/api/genes/search?q=${encodeURIComponent(query)}`),
 
   autocomplete: (prefix: string) =>
     fetchAPI<{ symbol: string; name: string }[]>(`/api/genes/autocomplete?q=${encodeURIComponent(prefix)}`),
 
   getVariants: (geneSymbol: string, ensemblId: string, params: Record<string, string>) => {
     const search = new URLSearchParams({ ensembl_id: ensemblId, ...params });
-    return fetchAPI<import("@/types").VariantListResult>(`/api/genes/${geneSymbol}/variants?${search}`);
+    return fetchAPI<VariantListResult>(`/api/genes/${geneSymbol}/variants?${search}`);
   },
 
   getVariantAnnotation: (rsid: string) =>
-    fetchAPI<import("@/types").Variant>(`/api/variants/${rsid}/annotation`),
+    fetchAPI<Variant>(`/api/variants/${rsid}/annotation`),
 
-  getMe: () => fetchAPI<import("@/types").User>("/api/user/me"),
+  getMe: () => fetchAPI<User>("/api/user/me"),
 
-  getHistory: () => fetchAPI<{ history: import("@/types").HistoryEntry[]; total: number }>("/api/user/history"),
+  getHistory: () => fetchAPI<{ history: HistoryEntry[]; total: number }>("/api/user/history"),
 };
