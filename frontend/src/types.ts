@@ -64,3 +64,53 @@ export interface HistoryEntry {
 }
 
 export type ImpactLevel = "HIGH" | "MODERATE" | "LOW" | "MODIFIER";
+
+export type SearchMode = "gene" | "pathway";
+
+// ── Pathway (Reactome) ──────────────────────────────────────────
+export interface Pathway {
+  pathway_id: string;
+  name: string;
+  species: string;
+  reactome_url: string;
+}
+
+export interface PathwaySearchResult {
+  pathways: Pathway[];
+  query: string;
+  total: number;
+}
+
+export interface PathwayProtein {
+  symbol: string;
+  display_name: string | null;
+  uniprot_id: string | null;
+  uniprot_url: string | null;
+}
+
+export interface PathwayProteinsResult {
+  pathway_id: string;
+  proteins: PathwayProtein[];
+  total: number;
+}
+
+// ── STRING DB ───────────────────────────────────────────────────
+export interface StringPartner {
+  symbol: string;
+  string_id: string | null;
+  combined_score: number;
+  neighborhood_score: number;
+  fusion_score: number;
+  cooccurrence_score: number;
+  experimental_score: number;
+  database_score: number;
+  textmining_score: number;
+  string_url: string | null;
+}
+
+export interface StringPartnersResult {
+  gene_symbol: string;
+  partners: StringPartner[];
+  total: number;
+  string_search_url: string;
+}

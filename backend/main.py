@@ -10,6 +10,7 @@ from backend.api.genes import router as genes_router
 from backend.api.variants import router as variants_router
 from backend.api.auth import router as auth_router
 from backend.api.users import router as users_router
+from backend.api.pathways import router as pathways_router
 
 
 @asynccontextmanager
@@ -35,6 +36,7 @@ app.include_router(genes_router)
 app.include_router(variants_router)
 app.include_router(auth_router)
 app.include_router(users_router)
+app.include_router(pathways_router)
 
 
 @app.get("/api/health")

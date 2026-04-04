@@ -8,6 +8,7 @@ import { VariantTable } from "@/components/VariantTable";
 import { FilterPanel } from "@/components/FilterPanel";
 import { SkeletonTable } from "@/components/SkeletonTable";
 import { SourceLinkButtons } from "@/components/SourceLinkButtons";
+import { StringPartnersPanel } from "@/components/StringPartnersPanel";
 import { useVariants } from "@/hooks/useVariants";
 import type { VariantFilters, Gene } from "@/types";
 
@@ -31,7 +32,7 @@ export function GeneDetailPage() {
   const { data: variantData, isLoading: variantsLoading } = useVariants(geneForVariants, filters);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10">
       <header>
         <h1 className="text-3xl font-extrabold tracking-tight text-[#002045]">
           {geneSymbol}
@@ -74,22 +75,31 @@ export function GeneDetailPage() {
         </div>
       )}
 
-      {/* Variant Table */}
-      <h2 className="text-xl font-bold text-[#002045]">SNP Annotations</h2>
-      <div className="flex gap-6">
-        <div className="w-64 flex-shrink-0">
-          <FilterPanel filters={filters} onChange={setFilters} />
+      {/* STRING Functional Partners */}
+      {geneSymbol && (
+        <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-100">
+          <StringPartnersPanel geneSymbol={geneSymbol} />
         </div>
-        <div className="flex-1">
-          {variantsLoading ? (
-            <SkeletonTable rows={10} cols={8} />
-          ) : variantData?.variants.length ? (
-            <VariantTable variants={variantData.variants} />
-          ) : (
-            <div className="p-8 text-center bg-slate-50 rounded-xl text-slate-500">
-              No variants found
-            </div>
-          )}
+      )}
+
+      {/* Variant Table */}
+      <div>
+        <h2 className="text-xl font-bold text-[#002045] mb-4">SNP Annotations</h2>
+        <div className="flex gap-6">
+          <div className="w-64 flex-shrink-0">
+            <FilterPanel filters={filters} onChange={setFilters} />
+          </div>
+          <div className="flex-1">
+            {variantsLoading ? (
+              <SkeletonTable rows={10} cols={8} />
+            ) : variantData?.variants.length ? (
+              <VariantTable variants={variantData.variants} />
+            ) : (
+              <div className="p-8 text-center bg-slate-50 rounded-xl text-slate-500">
+                No variants found
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>

@@ -1,4 +1,13 @@
-import type { GeneSearchResult, VariantListResult, Variant, User, HistoryEntry } from "@/types";
+import type {
+  GeneSearchResult,
+  VariantListResult,
+  Variant,
+  User,
+  HistoryEntry,
+  PathwaySearchResult,
+  PathwayProteinsResult,
+  StringPartnersResult,
+} from "@/types";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
@@ -31,4 +40,17 @@ export const api = {
   getMe: () => fetchAPI<User>("/api/user/me"),
 
   getHistory: () => fetchAPI<{ history: HistoryEntry[]; total: number }>("/api/user/history"),
+
+  // Pathway (Reactome)
+  searchPathways: (query: string) =>
+    fetchAPI<PathwaySearchResult>(`/api/pathways/search?q=${encodeURIComponent(query)}`),
+
+  getPathwayProteins: (pathwayId: string) =>
+    fetchAPI<PathwayProteinsResult>(`/api/pathways/${encodeURIComponent(pathwayId)}/proteins`),
+
+  // STRING DB functional partners
+  getStringPartners: (geneSymbol: string, limit = 20) =>
+    fetchAPI<StringPartnersResult>(
+      `/api/genes/${encodeURIComponent(geneSymbol)}/string-partners?limit=${limit}`
+    ),
 };

@@ -5,10 +5,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.core.database import get_db
 from backend.core.rate_limiter import limiter
 from backend.schemas.gene import GeneResponse, GeneSearchResult
+from backend.schemas.string_partner import StringPartner, StringPartnersResult
 from backend.services.gene_pipeline import GenePipeline
+from backend.services.string_db import StringDBClient
 
 router = APIRouter(prefix="/api/genes", tags=["genes"])
 pipeline = GenePipeline()
+string_db = StringDBClient()
 
 
 @router.get("/search", response_model=GeneSearchResult)
@@ -47,3 +50,19 @@ async def autocomplete(
 ):
     results = await pipeline.search_genes_cached(q, db)
     return [{"symbol": g["symbol"], "name": g.get("name") or g.get("full_name", "")} for g in results[:10]]
+
+
+@router.get("/{gene_symbol}/string-partners", response_model=StringPartnersResult)
+async def get_string_partners(
+    gene_symbol: str,
+    limit: int = Query(20, ge=1, le=50),
+):
+    """Fetch predicted functional partners from STRING DB for a given gene."""
+    partners_raw = await string_db.get_interaction_partners(gene_symbol, limit=limit)
+    partners = [StringPartner(**p) for p in partners_raw]
+    return StringPartnersResult(
+        gene_symbol=gene_symbol,
+        partners=partners,
+        total=len(partners),
+        string_search_url="https://string-db.org/cgi/network?identifiers={}&species=9606".format(gene_symbol),
+    )
