@@ -1,5 +1,9 @@
 from typing import Optional, List
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
+from starlette.requests import Request
+from sqlalchemy.ext.asyncio import AsyncSession
+from backend.core.database import get_db
+from backend.core.rate_limiter import limiter
 from backend.schemas.gene import GeneResponse, GeneSearchResult
 from backend.services.gene_pipeline import GenePipeline
 
@@ -8,19 +12,28 @@ pipeline = GenePipeline()
 
 
 @router.get("/search", response_model=GeneSearchResult)
-async def search_genes(q: str = Query(..., min_length=1, description="Gene symbol or protein name")):
-    results = await pipeline.search_genes(q)
+@limiter.limit("60/minute")
+async def search_genes(
+    request: Request,
+    q: str = Query(..., min_length=1, description="Gene symbol or protein name"),
+    db: AsyncSession = Depends(get_db),
+):
+    results = await pipeline.search_genes_cached(q, db)
     genes = [
         GeneResponse(
-            gene_id="{}_{}".format(g['symbol'], g['ncbi_id']),
+            gene_id="{}_{}".format(g["symbol"], g.get("ncbi_id", "")),
             symbol=g["symbol"],
-            full_name=g.get("name"),
+            full_name=g.get("name") or g.get("full_name"),
             chromosome=g.get("chromosome"),
             length=g.get("length"),
             ncbi_id=g.get("ncbi_id"),
             ensembl_id=g.get("ensembl_id"),
-            ncbi_url="https://www.ncbi.nlm.nih.gov/gene/{}".format(g['ncbi_id']) if g.get("ncbi_id") else None,
-            ensembl_url="https://ensembl.org/Homo_sapiens/Gene/Summary?g={}".format(g['ensembl_id']) if g.get("ensembl_id") else None,
+            ncbi_url=g.get("ncbi_url") or (
+                "https://www.ncbi.nlm.nih.gov/gene/{}".format(g["ncbi_id"]) if g.get("ncbi_id") else None
+            ),
+            ensembl_url=g.get("ensembl_url") or (
+                "https://ensembl.org/Homo_sapiens/Gene/Summary?g={}".format(g["ensembl_id"]) if g.get("ensembl_id") else None
+            ),
         )
         for g in results
     ]
@@ -28,6 +41,9 @@ async def search_genes(q: str = Query(..., min_length=1, description="Gene symbo
 
 
 @router.get("/autocomplete")
-async def autocomplete(q: str = Query(..., min_length=1)):
-    results = await pipeline.search_genes(q)
-    return [{"symbol": g["symbol"], "name": g.get("name", "")} for g in results[:10]]
+async def autocomplete(
+    q: str = Query(..., min_length=1),
+    db: AsyncSession = Depends(get_db),
+):
+    results = await pipeline.search_genes_cached(q, db)
+    return [{"symbol": g["symbol"], "name": g.get("name") or g.get("full_name", "")} for g in results[:10]]

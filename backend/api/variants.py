@@ -1,6 +1,8 @@
 import asyncio
 from typing import Optional, List
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
+from backend.core.database import get_db
 from backend.schemas.variant import VariantListResult, VariantResponse
 from backend.services.gene_pipeline import GenePipeline
 from backend.services.vep import VEPClient
@@ -22,8 +24,17 @@ async def get_gene_variants(
     regulome_max: Optional[int] = None,
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
 ):
-    raw = await pipeline.get_variants_annotated(gene_symbol, ensembl_id, limit=500)
+    filters = {
+        "cadd_min": cadd_min,
+        "cadd_max": cadd_max,
+        "gerp_min": gerp_min,
+        "consequence": consequence,
+        "impact": impact,
+        "regulome_max": regulome_max,
+    }
+    raw = await pipeline.get_variants_cached(gene_symbol, ensembl_id, filters, page, limit, db)
 
     filtered = raw
     if cadd_min is not None:
@@ -50,7 +61,7 @@ async def get_gene_variants(
 
     total = len(filtered)
     start = (page - 1) * limit
-    page_data = filtered[start : start + limit]
+    page_data = filtered[start: start + limit]
 
     variants = [
         VariantResponse(
@@ -63,8 +74,8 @@ async def get_gene_variants(
             regulome_rank=v.get("regulome_rank"),
             protein_position=v.get("protein_position"),
             amino_acid_change=v.get("amino_acid_change"),
-            dbsnp_url="https://www.ncbi.nlm.nih.gov/snp/{}".format(v['rsid']),
-            ensembl_vep_url="https://ensembl.org/Homo_sapiens/Variation/Explore?v={}".format(v['rsid']),
+            dbsnp_url="https://www.ncbi.nlm.nih.gov/snp/{}".format(v["rsid"]),
+            ensembl_vep_url="https://ensembl.org/Homo_sapiens/Variation/Explore?v={}".format(v["rsid"]),
         )
         for v in page_data
     ]
