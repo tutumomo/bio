@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useGeneSearch } from "@/hooks/useGeneSearch";
 import { GeneTable } from "@/components/GeneTable";
 import { SkeletonTable } from "@/components/SkeletonTable";
-import { exportCSV } from "@/lib/export";
+import { exportCSV, exportTSV } from "@/lib/export";
 import { FilterPanel } from "@/components/FilterPanel";
 import { VariantTable } from "@/components/VariantTable";
 import { PathwayResultsPanel } from "@/components/PathwayResultsPanel";
@@ -50,6 +50,25 @@ export function ResultsPage() {
     ]);
     exportCSV(headers, rows, `gene_overview_${query}.csv`);
   };
+
+  const VARIANT_HEADERS = ["Gene", "rsID", "Consequence", "Impact", "CADD", "GERP++", "RegulomeDB", "Protein Position", "Amino Acid Change", "dbSNP URL", "VEP URL"];
+  const variantRows = () =>
+    (variantData?.variants ?? []).map((v) => [
+      v.gene_symbol ?? "",
+      v.rsid,
+      v.consequence ?? "",
+      v.impact ?? "",
+      v.cadd_score?.toString() ?? "",
+      v.gerp_score?.toString() ?? "",
+      v.regulome_rank ?? "",
+      v.protein_position ?? "",
+      v.amino_acid_change ?? "",
+      v.dbsnp_url ?? "",
+      v.ensembl_vep_url ?? "",
+    ]);
+
+  const handleExportVariantsCSV = () => exportCSV(VARIANT_HEADERS, variantRows(), `variants_${query}.csv`);
+  const handleExportVariantsTSV = () => exportTSV(VARIANT_HEADERS, variantRows(), `variants_${query}.tsv`);
 
   const isLoading = mode === "pathway" ? pathwayLoading : geneLoading;
 
@@ -131,7 +150,26 @@ export function ResultsPage() {
               <div className="w-64 flex-shrink-0">
                 <FilterPanel filters={filters} onChange={setFilters} />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 space-y-3">
+                {variantData?.variants.length ? (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-slate-500">{variantData.total} variants</span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleExportVariantsCSV}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-[#002045] text-white text-xs font-bold rounded-lg hover:opacity-90"
+                      >
+                        <Download className="w-3 h-3" /> CSV
+                      </button>
+                      <button
+                        onClick={handleExportVariantsTSV}
+                        className="flex items-center gap-2 px-3 py-1.5 border border-slate-200 text-[#002045] text-xs font-bold rounded-lg hover:bg-slate-50"
+                      >
+                        <Download className="w-3 h-3" /> TSV
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
                 {variantsLoading ? (
                   <SkeletonTable rows={10} cols={8} />
                 ) : variantData?.variants.length ? (
