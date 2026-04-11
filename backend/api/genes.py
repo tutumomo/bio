@@ -1,3 +1,4 @@
+import uuid
 from typing import Optional, List
 from fastapi import APIRouter, Depends, Query
 from starlette.requests import Request
@@ -8,6 +9,8 @@ from backend.schemas.gene import GeneResponse, GeneSearchResult
 from backend.schemas.string_partner import StringPartner, StringPartnersResult
 from backend.services.gene_pipeline import GenePipeline
 from backend.services.string_db import StringDBClient
+from backend.auth.dependencies import get_optional_user
+from backend.models.user import SearchHistory
 
 router = APIRouter(prefix="/api/genes", tags=["genes"])
 pipeline = GenePipeline()
@@ -20,6 +23,7 @@ async def search_genes(
     request: Request,
     q: str = Query(..., min_length=1, description="Gene symbol or protein name"),
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[dict] = Depends(get_optional_user),
 ):
     results = await pipeline.search_genes_cached(q, db)
     genes = [
@@ -40,6 +44,16 @@ async def search_genes(
         )
         for g in results
     ]
+
+    if current_user and genes:
+        history_entry = SearchHistory(
+            user_id=uuid.UUID(current_user["sub"]),
+            query=q,
+            gene_count=len(genes),
+        )
+        db.add(history_entry)
+        await db.commit()
+
     return GeneSearchResult(genes=genes, query=q, total=len(genes))
 
 
