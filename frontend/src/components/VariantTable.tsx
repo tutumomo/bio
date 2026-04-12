@@ -12,6 +12,7 @@ import type { Variant } from "@/types";
 import { ImpactBadge } from "./ImpactBadge";
 import { CaddScoreBar } from "./CaddScoreBar";
 import { SourceLinkButtons } from "./SourceLinkButtons";
+import { exportCSV } from "@/lib/export";
 
 const columnHelper = createColumnHelper<Variant>();
 
@@ -19,6 +20,21 @@ export function VariantTable({ variants }: { variants: Variant[] }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleExportCSV = () => {
+    const headers = ["RSID", "Gene", "Consequence", "Impact", "CADD", "GERP++", "RegulomeDB"];
+    const rows = variants.map((v) => [
+      v.rsid || "N/A",
+      v.gene_symbol || "N/A",
+      v.consequence ?? "N/A",
+      v.impact ?? "N/A",
+      v.cadd_score?.toString() ?? "N/A",
+      v.gerp_score?.toString() ?? "N/A",
+      v.regulome_rank ?? "N/A",
+    ]);
+    const geneSymbol = variants[0]?.gene_symbol ?? "gene";
+    exportCSV(headers, rows, `variant_annotations_${geneSymbol}.csv`);
+  };
 
   const columns = useMemo(
     () => [
@@ -126,6 +142,7 @@ export function VariantTable({ variants }: { variants: Variant[] }) {
           >
             {virtualizer.getVirtualItems().map((virtualRow) => {
               const row = rows[virtualRow.index];
+              const isHighImpact = row.original.impact === "HIGH";
               const isHighCadd = (row.original.cadd_score ?? 0) >= 25;
               return (
                 <tr
@@ -133,7 +150,7 @@ export function VariantTable({ variants }: { variants: Variant[] }) {
                   data-index={virtualRow.index}
                   ref={(node) => virtualizer.measureElement(node)}
                   className={`hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-50 ${
-                    isHighCadd ? "bg-red-50/30" : ""
+                    isHighImpact ? "bg-red-50" : isHighCadd ? "bg-orange-50/20" : ""
                   }`}
                   style={{
                     position: "absolute",
@@ -157,8 +174,28 @@ export function VariantTable({ variants }: { variants: Variant[] }) {
           </tbody>
         </table>
       </div>
-      <div className="px-4 py-2 bg-slate-50 text-xs text-slate-500 border-t border-slate-100">
-        Showing {variants.length} variants
+      <div className="px-4 py-2 bg-slate-50 text-xs text-slate-500 border-t border-slate-100 flex justify-between items-center">
+        <span>Showing {variants.length} variants</span>
+        <button
+          onClick={handleExportCSV}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+        >
+          <svg
+            className="w-3.5 h-3.5 text-slate-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+            />
+          </svg>
+          Download CSV
+        </button>
       </div>
     </div>
   );

@@ -115,3 +115,15 @@ export interface StringPartnersResult {
   total: number;
   string_search_url: string;
 }
+
+// ── Tissue Expression (GTEx) ──────────────────────────────────
+export interface TissueExpressionEntry {
+  tissue: string;
+  tpm: number;
+}
+
+export interface TissueExpressionResult {
+  gene_symbol: string;
+  ensembl_id: string;
+  expression: TissueExpressionEntry[];
+}

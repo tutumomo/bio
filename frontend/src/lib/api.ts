@@ -7,6 +7,7 @@ import type {
   PathwaySearchResult,
   PathwayProteinsResult,
   StringPartnersResult,
+  TissueExpressionResult,
 } from "@/types";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
@@ -62,4 +63,11 @@ export const api = {
     fetchAPI<StringPartnersResult>(
       `/api/genes/${encodeURIComponent(geneSymbol)}/string-partners?limit=${limit}`
     ),
+
+  getTissueExpression: (geneSymbol: string, ensemblId?: string) => {
+    const search = ensemblId ? `?ensembl_id=${encodeURIComponent(ensemblId)}` : "";
+    return fetchAPI<TissueExpressionResult>(
+      `/api/genes/${encodeURIComponent(geneSymbol)}/expression${search}`
+    );
+  },
 };

@@ -9,6 +9,7 @@ import { FilterPanel } from "@/components/FilterPanel";
 import { SkeletonTable } from "@/components/SkeletonTable";
 import { SourceLinkButtons } from "@/components/SourceLinkButtons";
 import { StringPartnersPanel } from "@/components/StringPartnersPanel";
+import TissueExpressionChart from "@/components/TissueExpressionChart";
 import { useVariants } from "@/hooks/useVariants";
 import type { VariantFilters, Gene } from "@/types";
 
@@ -82,6 +83,11 @@ export function GeneDetailPage() {
         <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-100">
           <StringPartnersPanel geneSymbol={geneSymbol} />
         </div>
+      )}
+
+      {/* Tissue Expression Chart */}
+      {geneSymbol && (
+        <TissueExpressionChart geneSymbol={geneSymbol} ensemblId={ensemblId || undefined} />
       )}
 
       {/* Variant Table */}
