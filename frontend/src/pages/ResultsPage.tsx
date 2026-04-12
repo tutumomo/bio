@@ -15,12 +15,37 @@ import { api } from "@/lib/api";
 import type { VariantFilters, SearchMode } from "@/types";
 
 export function ResultsPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const mode = (searchParams.get("mode") ?? "gene") as SearchMode;
   const query = searchParams.get("q") ?? "";
 
   const [activeTab, setActiveTab] = useState<"overview" | "variants">("overview");
-  const [filters, setFilters] = useState<VariantFilters>({});
+
+  // Derive filters from URL
+  const filters: VariantFilters = {
+    cadd_min: searchParams.get("cadd_min") ? Number(searchParams.get("cadd_min")) : undefined,
+    cadd_max: searchParams.get("cadd_max") ? Number(searchParams.get("cadd_max")) : undefined,
+    gerp_min: searchParams.get("gerp_min") ? Number(searchParams.get("gerp_min")) : undefined,
+    regulome_max: searchParams.get("regulome_max") ? Number(searchParams.get("regulome_max")) : undefined,
+    consequence: searchParams.get("consequence")?.split(",").filter(Boolean),
+    impact: searchParams.get("impact")?.split(",").filter(Boolean),
+  };
+
+  const setFilters = (newFilters: VariantFilters) => {
+    const nextParams = new URLSearchParams(searchParams);
+    // Clear old
+    ["cadd_min", "cadd_max", "gerp_min", "regulome_max", "consequence", "impact"].forEach((k) =>
+      nextParams.delete(k)
+    );
+    // Set new
+    if (newFilters.cadd_min !== undefined) nextParams.set("cadd_min", String(newFilters.cadd_min));
+    if (newFilters.cadd_max !== undefined) nextParams.set("cadd_max", String(newFilters.cadd_max));
+    if (newFilters.gerp_min !== undefined) nextParams.set("gerp_min", String(newFilters.gerp_min));
+    if (newFilters.regulome_max !== undefined) nextParams.set("regulome_max", String(newFilters.regulome_max));
+    if (newFilters.consequence?.length) nextParams.set("consequence", newFilters.consequence.join(","));
+    if (newFilters.impact?.length) nextParams.set("impact", newFilters.impact.join(","));
+    setSearchParams(nextParams);
+  };
 
   // ── Gene mode ──────────────────────────────────────────────────
   const { data: geneData, isLoading: geneLoading, error: geneError } = useGeneSearch();
