@@ -43,7 +43,10 @@
   1. User can sign in using Google or GitHub.
   2. User's previous searches are listed in the History tab.
   3. Clicking a history entry re-renders the cached results without redundant API calls.
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 03-01-PLAN.md — Persistent Auth & User Identity
+- [ ] 03-02-PLAN.md — Comprehensive Search History API
+- [ ] 03-03-PLAN.md — History UI with Click-to-Replay
 **UI hint**: yes
 
 ### Phase 4: Advanced Features & Export
@@ -74,6 +77,6 @@
 |-------|----------------|--------|-----------|
 | 1. Foundation & Gene Search | 0/1 | Near Completion (90%) | - |
 | 2. Variant Annotation & Filtering | 0/2 | In Progress (40%) | - |
-| 3. Authentication & History | 0/1 | Not started | - |
+| 3. Authentication & History | 0/3 | Not started | - |
 | 4. Advanced Features & Export | 0/1 | Not started | - |
 | 5. Production Deployment & Polish | 0/1 | Not started | - |
