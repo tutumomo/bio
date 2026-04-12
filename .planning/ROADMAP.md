@@ -2,9 +2,9 @@
 
 ## Phases
 
-- [ ] **Phase 1: Foundation & Gene Search** - Setup monorepo infrastructure and implement core gene discovery via NCBI.
-- [ ] **Phase 2: Variant Annotation & Filtering** - Implement high-density variant discovery and functional annotation via Ensembl VEP and RegulomeDB.
-- [ ] **Phase 3: Authentication & History** - Secure the platform with OAuth and implement user search history.
+- [x] **Phase 1: Foundation & Gene Search** - Setup monorepo infrastructure and implement core gene discovery via NCBI.
+- [x] **Phase 2: Variant Annotation & Filtering** - Implement high-density variant discovery and functional annotation via Ensembl VEP and RegulomeDB.
+- [x] **Phase 3: Authentication & History** - Secure the platform with OAuth and implement user search history.
 - [ ] **Phase 4: Advanced Features & Export** - Deep-dive gene detail views, charts, and publication-ready data export.
 - [ ] **Phase 5: Production Deployment & Polish** - Deploy to Railway/Vercel and finalize UI/UX polish.
 
@@ -19,7 +19,7 @@
   2. Search results are cached in PostgreSQL for 7 days.
   3. API rate limiting is enforced to prevent external API bans.
 **Plans**:
-- [ ] 01-01-PLAN.md — Foundation Verification (TBD)
+- [x] 01-01-PLAN.md — Foundation Verification (TBD)
 **UI hint**: yes
 
 ### Phase 2: Variant Annotation & Filtering
@@ -31,8 +31,8 @@
   2. Filtering by CADD score instantly updates the virtualized table with zero lag.
   3. Impact levels (HIGH, MODERATE, etc.) are color-coded in the UI.
 **Plans**:
-- [ ] 02-01-PLAN.md — Optimized Batch Annotation & Discovery
-- [ ] 02-02-PLAN.md — DB-Level Filtering & High-Density UI
+- [x] 02-01-PLAN.md — Optimized Batch Annotation & Discovery
+- [x] 02-02-PLAN.md — DB-Level Filtering & High-Density UI
 **UI hint**: yes
 
 ### Phase 3: Authentication & History
@@ -44,9 +44,9 @@
   2. User's previous searches are listed in the History tab.
   3. Clicking a history entry re-renders the cached results without redundant API calls.
 **Plans**: 3 plans
-- [ ] 03-01-PLAN.md — Persistent Auth & User Identity
-- [ ] 03-02-PLAN.md — Comprehensive Search History API
-- [ ] 03-03-PLAN.md — History UI with Click-to-Replay
+- [x] 03-01-PLAN.md — Persistent Auth & User Identity
+- [x] 03-02-PLAN.md — Comprehensive Search History API
+- [x] 03-03-PLAN.md — History UI with Click-to-Replay
 **UI hint**: yes
 
 ### Phase 4: Advanced Features & Export
@@ -57,7 +57,10 @@
   1. Gene Detail page displays a responsive tissue expression chart.
   2. Search bar provides autocomplete suggestions from the cache.
   3. User can download a CSV of variant results matching "Supplementary Table 1" format.
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 04-01-PLAN.md — Autocomplete & CSV Export
+- [ ] 04-02-PLAN.md — Tissue Expression Backend
+- [ ] 04-03-PLAN.md — Expression Visualization
 **UI hint**: yes
 
 ### Phase 5: Production Deployment & Polish
@@ -75,8 +78,8 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Gene Search | 0/1 | Near Completion (90%) | - |
-| 2. Variant Annotation & Filtering | 0/2 | In Progress (40%) | - |
-| 3. Authentication & History | 0/3 | Not started | - |
-| 4. Advanced Features & Export | 0/1 | Not started | - |
+| 1. Foundation & Gene Search | 1/1 | Completed | 2026-04-12 |
+| 2. Variant Annotation & Filtering | 2/2 | Completed | 2026-04-12 |
+| 3. Authentication & History | 3/3 | Completed | 2026-04-12 |
+| 4. Advanced Features & Export | 0/3 | Not started | - |
 | 5. Production Deployment & Polish | 0/1 | Not started | - |
