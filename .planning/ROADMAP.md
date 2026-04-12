@@ -18,7 +18,8 @@
   1. User can search for a gene (e.g., "BRCA1") and see correct NCBI metadata in the UI table.
   2. Search results are cached in PostgreSQL for 7 days.
   3. API rate limiting is enforced to prevent external API bans.
-**Plans**: TBD
+**Plans**:
+- [ ] 01-01-PLAN.md — Foundation Verification (TBD)
 **UI hint**: yes
 
 ### Phase 2: Variant Annotation & Filtering
@@ -29,7 +30,9 @@
   1. Selecting a gene row displays thousands of variants with CADD and GERP++ scores.
   2. Filtering by CADD score instantly updates the virtualized table with zero lag.
   3. Impact levels (HIGH, MODERATE, etc.) are color-coded in the UI.
-**Plans**: TBD
+**Plans**:
+- [ ] 02-01-PLAN.md — Optimized Batch Annotation & Discovery
+- [ ] 02-02-PLAN.md — DB-Level Filtering & High-Density UI
 **UI hint**: yes
 
 ### Phase 3: Authentication & History
@@ -70,7 +73,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Gene Search | 0/1 | Near Completion (90%) | - |
-| 2. Variant Annotation & Filtering | 0/1 | In Progress (40%) | - |
+| 2. Variant Annotation & Filtering | 0/2 | In Progress (40%) | - |
 | 3. Authentication & History | 0/1 | Not started | - |
 | 4. Advanced Features & Export | 0/1 | Not started | - |
 | 5. Production Deployment & Polish | 0/1 | Not started | - |
