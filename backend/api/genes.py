@@ -1,9 +1,9 @@
 import uuid
-from datetime import date
+from datetime import date, datetime, timedelta
 from typing import Optional, List
 from fastapi import APIRouter, Depends, Query, HTTPException
 from starlette.requests import Request
-from sqlalchemy import select
+from sqlalchemy import select, desc, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.core.database import get_db
 from backend.core.rate_limiter import limiter
@@ -25,7 +25,7 @@ async def search_genes(
     request: Request,
     q: str = Query(..., min_length=1, description="Gene symbol or protein name"),
     db: AsyncSession = Depends(get_db),
-    current_user: Optional[dict] = Depends(get_optional_user),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
     results = await pipeline.search_genes_cached(q, db)
     genes = [
@@ -48,32 +48,48 @@ async def search_genes(
     ]
 
     if current_user and genes:
-        user_id = uuid.UUID(current_user["sub"])
-        
         # Enforce per-user daily query limit
-        result = await db.execute(select(User).where(User.id == user_id))
-        user_obj = result.scalar_one_or_none()
+        today = date.today()
+        if current_user.last_query_date != today:
+            current_user.daily_query_count = 0
+            current_user.last_query_date = today
         
-        if user_obj:
-            today = date.today()
-            if user_obj.last_query_date != today:
-                user_obj.daily_query_count = 0
-                user_obj.last_query_date = today
-            
-            if user_obj.daily_query_count >= 100:
-                raise HTTPException(
-                    status_code=429, 
-                    detail="Daily query limit reached (100/day)"
-                )
-            
-            user_obj.daily_query_count += 1
+        if current_user.daily_query_count >= 100:
+            raise HTTPException(
+                status_code=429, 
+                detail="Daily query limit reached (100/day)"
+            )
+        
+        current_user.daily_query_count += 1
 
-        history_entry = SearchHistory(
-            user_id=user_id,
-            query=q,
-            gene_count=len(genes),
+        # Check for duplicate query within 5 minutes
+        five_minutes_ago = datetime.now() - timedelta(minutes=5)
+        stmt = (
+            select(SearchHistory)
+            .where(
+                SearchHistory.user_id == current_user.id,
+                SearchHistory.query == q,
+                SearchHistory.searched_at >= five_minutes_ago
+            )
+            .order_by(desc(SearchHistory.searched_at))
+            .limit(1)
         )
-        db.add(history_entry)
+        
+        result = await db.execute(stmt)
+        last_history = result.scalar_one_or_none()
+        
+        if last_history:
+            # Just update the timestamp
+            last_history.searched_at = func.now()
+        else:
+            # Create new entry
+            history_entry = SearchHistory(
+                user_id=current_user.id,
+                query=q,
+                gene_count=len(genes),
+            )
+            db.add(history_entry)
+            
         await db.commit()
 
     return GeneSearchResult(genes=genes, query=q, total=len(genes))

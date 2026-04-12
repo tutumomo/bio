@@ -37,15 +37,18 @@ export const api = {
   getVariantAnnotation: (rsid: string) =>
     fetchAPI<Variant>(`/api/variants/${rsid}/annotation`),
 
-  getMe: () => fetchAPI<User>("/api/user/me"),
+  getMe: () => fetchAPI<User>("/api/users/me"),
 
-  getHistory: () => fetchAPI<{ history: HistoryEntry[]; total: number }>("/api/user/history"),
+  getHistory: (limit = 50, offset = 0) =>
+    fetchAPI<{ history: HistoryEntry[]; total: number }>(
+      `/api/users/me/history?limit=${limit}&offset=${offset}`
+    ),
 
   deleteHistoryEntry: (id: string) =>
-    fetchAPI<{ status: string }>(`/api/user/history/${id}`, { method: "DELETE" }),
+    fetchAPI<{ status: string }>(`/api/users/me/history/${id}`, { method: "DELETE" }),
 
   clearHistory: () =>
-    fetchAPI<{ status: string }>("/api/user/history", { method: "DELETE" }),
+    fetchAPI<{ status: string }>("/api/users/me/history", { method: "DELETE" }),
 
   // Pathway (Reactome)
   searchPathways: (query: string) =>
