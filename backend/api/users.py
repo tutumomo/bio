@@ -1,5 +1,5 @@
 import uuid
-from fastapi import APIRouter, Depends, Response, Query
+from fastapi import APIRouter, Depends, Response, Query, HTTPException
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.auth.dependencies import get_current_user
@@ -10,25 +10,25 @@ router = APIRouter(prefix="/api/user", tags=["user"])
 
 
 @router.get("/me")
-async def get_me(user: dict = Depends(get_current_user)):
+async def get_me(user: User = Depends(get_current_user)):
     return {
-        "id": user["sub"],
-        "email": user.get("email"),
-        "name": user.get("name"),
-        "avatar_url": user.get("avatar"),
-        "provider": user.get("provider"),
+        "id": str(user.id),
+        "email": user.email,
+        "name": user.name,
+        "avatar_url": user.avatar_url,
+        "provider": user.provider,
     }
 
 
 @router.get("/history")
 async def get_history(
     limit: int = Query(50, ge=1, le=200),
-    user: dict = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     stmt = (
         select(SearchHistory)
-        .where(SearchHistory.user_id == uuid.UUID(user["sub"]))
+        .where(SearchHistory.user_id == user.id)
         .order_by(desc(SearchHistory.searched_at))
         .limit(limit)
     )
@@ -52,17 +52,21 @@ async def get_history(
 @router.delete("/history/{history_id}")
 async def delete_history_entry(
     history_id: str,
-    user: dict = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    try:
+        entry_uuid = uuid.UUID(history_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid history ID format")
+
     stmt = select(SearchHistory).where(
-        SearchHistory.id == uuid.UUID(history_id),
-        SearchHistory.user_id == uuid.UUID(user["sub"]),
+        SearchHistory.id == entry_uuid,
+        SearchHistory.user_id == user.id,
     )
     result = await db.execute(stmt)
     entry = result.scalar_one_or_none()
     if not entry:
-        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="History entry not found")
     await db.delete(entry)
     await db.commit()
@@ -71,12 +75,12 @@ async def delete_history_entry(
 
 @router.delete("/history")
 async def clear_history(
-    user: dict = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     from sqlalchemy import delete as sql_delete
     stmt = sql_delete(SearchHistory).where(
-        SearchHistory.user_id == uuid.UUID(user["sub"])
+        SearchHistory.user_id == user.id
     )
     await db.execute(stmt)
     await db.commit()
