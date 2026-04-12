@@ -27,22 +27,22 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
   const update = (patch: Partial<VariantFilters>) => onChange({ ...filters, ...patch });
 
   return (
-    <div className="bg-white rounded-xl border border-slate-100 shadow-sm">
+    <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center justify-between px-4 py-3"
       >
-        <span className="flex items-center gap-2 text-xs font-bold text-[#002045] uppercase tracking-widest">
+        <span className="flex items-center gap-2 text-xs font-bold text-[#002045] dark:text-slate-100 uppercase tracking-widest">
           <Filter className="w-3.5 h-3.5" /> Filters
         </span>
-        {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        {expanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
       </button>
 
       {expanded && (
-        <div className="px-4 pb-4 space-y-5 border-t border-slate-100 pt-4">
+        <div className="px-4 pb-4 space-y-5 border-t border-slate-100 dark:border-slate-800 pt-4">
           {/* CADD Score Range */}
           <div>
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">
+            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">
               CADD Score
             </label>
             <div className="flex gap-2 items-center">
@@ -51,7 +51,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
                 placeholder="Min"
                 value={filters.cadd_min ?? ""}
                 onChange={(e) => update({ cadd_min: e.target.value ? Number(e.target.value) : undefined })}
-                className="w-20 border border-slate-200 rounded-lg px-2 py-1.5 text-sm"
+                className="w-20 border border-slate-200 dark:border-slate-800 bg-transparent dark:bg-slate-900 rounded-lg px-2 py-1.5 text-sm dark:text-slate-100"
               />
               <span className="text-slate-400">—</span>
               <input
@@ -59,14 +59,14 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
                 placeholder="Max"
                 value={filters.cadd_max ?? ""}
                 onChange={(e) => update({ cadd_max: e.target.value ? Number(e.target.value) : undefined })}
-                className="w-20 border border-slate-200 rounded-lg px-2 py-1.5 text-sm"
+                className="w-20 border border-slate-200 dark:border-slate-800 bg-transparent dark:bg-slate-900 rounded-lg px-2 py-1.5 text-sm dark:text-slate-100"
               />
             </div>
           </div>
 
           {/* GERP++ Min */}
           <div>
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">
+            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">
               GERP++ Min
             </label>
             <input
@@ -75,18 +75,18 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
               placeholder="e.g., 2.0"
               value={filters.gerp_min ?? ""}
               onChange={(e) => update({ gerp_min: e.target.value ? Number(e.target.value) : undefined })}
-              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm"
+              className="w-full border border-slate-200 dark:border-slate-800 bg-transparent dark:bg-slate-900 rounded-lg px-3 py-1.5 text-sm dark:text-slate-100"
             />
           </div>
 
           {/* Consequence */}
           <div>
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">
+            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">
               Consequence
             </label>
-            <div className="space-y-1.5 max-h-40 overflow-y-auto">
+            <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1 custom-scrollbar">
               {CONSEQUENCE_OPTIONS.map((c) => (
-                <label key={c} className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
+                <label key={c} className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={filters.consequence?.includes(c) ?? false}
@@ -96,7 +96,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
                         consequence: e.target.checked ? [...current, c] : current.filter((x) => x !== c),
                       });
                     }}
-                    className="rounded border-slate-300"
+                    className="rounded border-slate-300 dark:border-slate-700 dark:bg-slate-900 text-blue-600 focus:ring-blue-500/20"
                   />
                   {c.replace(/_/g, " ")}
                 </label>
@@ -106,7 +106,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
 
           {/* Impact */}
           <div>
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">
+            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">
               Impact
             </label>
             <div className="flex flex-wrap gap-2">
@@ -119,8 +119,10 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
                       const current = filters.impact ?? [];
                       update({ impact: selected ? current.filter((x) => x !== imp) : [...current, imp] });
                     }}
-                    className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${
-                      selected ? "bg-blue-50 border-blue-300 text-blue-700" : "border-slate-200 text-slate-500"
+                    className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors ${
+                      selected 
+                        ? "bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-800 text-blue-700 dark:text-blue-400" 
+                        : "border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900"
                     }`}
                   >
                     {imp}
@@ -132,17 +134,17 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
 
           {/* RegulomeDB Max */}
           <div>
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">
+            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">
               RegulomeDB Rank (max)
             </label>
             <select
               value={filters.regulome_max ?? ""}
               onChange={(e) => update({ regulome_max: e.target.value ? Number(e.target.value) : undefined })}
-              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm"
+              className="w-full border border-slate-200 dark:border-slate-800 bg-transparent dark:bg-slate-900 rounded-lg px-3 py-1.5 text-sm dark:text-slate-100"
             >
-              <option value="">Any</option>
+              <option value="" className="dark:bg-slate-900">Any</option>
               {[1, 2, 3, 4, 5, 6].map((n) => (
-                <option key={n} value={n}>
+                <option key={n} value={n} className="dark:bg-slate-900">
                   &le; {n}
                 </option>
               ))}
@@ -152,7 +154,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
           {/* Reset */}
           <button
             onClick={() => onChange({})}
-            className="w-full py-2 text-xs font-bold text-slate-500 hover:text-red-600 border border-slate-200 rounded-lg"
+            className="w-full py-2 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 border border-slate-200 dark:border-slate-800 rounded-lg transition-colors"
           >
             Reset Filters
           </button>

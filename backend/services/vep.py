@@ -2,9 +2,10 @@ import asyncio
 from typing import Dict, List, Optional
 
 import httpx
+from backend.core.resilience import retry_http
 
 ENSEMBL_REST = "https://rest.ensembl.org"
-VEP_BATCH_SIZE = 200
+VEP_BATCH_SIZE = 1000
 
 
 class VEPClient:
@@ -21,6 +22,7 @@ class VEPClient:
             all_results.extend(batch_results)
         return all_results
 
+    @retry_http(attempts=3)
     async def _annotate_batch(self, rsids: List[str]) -> List[Dict]:
         url = f"{ENSEMBL_REST}/vep/human/id"
         payload = {"ids": rsids}

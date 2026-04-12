@@ -12,13 +12,22 @@ import type {
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
+export class APIError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+    this.name = "APIError";
+  }
+}
+
 async function fetchAPI<T>(path: string, options?: RequestInit): Promise<T> {
   const resp = await fetch(`${API_BASE}${path}`, {
     credentials: "include",
     ...options,
   });
   if (!resp.ok) {
-    throw new Error(`API error: ${resp.status} ${resp.statusText}`);
+    throw new APIError(`API error: ${resp.status} ${resp.statusText}`, resp.status);
   }
   return resp.json();
 }

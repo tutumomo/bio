@@ -1,12 +1,12 @@
 import uuid
 from fastapi import APIRouter, Depends, Response, Query, HTTPException
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.auth.dependencies import get_current_user
 from backend.core.database import get_db
 from backend.models.user import SearchHistory, User
 
-router = APIRouter(prefix="/api/user", tags=["user"])
+router = APIRouter(prefix="/api/users", tags=["users"])
 
 
 @router.get("/me")
@@ -20,17 +20,24 @@ async def get_me(user: User = Depends(get_current_user)):
     }
 
 
-@router.get("/history")
+@router.get("/me/history")
 async def get_history(
-    limit: int = Query(50, ge=1, le=200),
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    # Get total count
+    count_stmt = select(func.count()).where(SearchHistory.user_id == user.id)
+    count_result = await db.execute(count_stmt)
+    total = count_result.scalar() or 0
+
     stmt = (
         select(SearchHistory)
         .where(SearchHistory.user_id == user.id)
         .order_by(desc(SearchHistory.searched_at))
         .limit(limit)
+        .offset(offset)
     )
     result = await db.execute(stmt)
     rows = result.scalars().all()
@@ -41,15 +48,16 @@ async def get_history(
                 "query": row.query,
                 "gene_count": row.gene_count,
                 "variant_count": row.variant_count,
+                "filters": row.filters,
                 "searched_at": row.searched_at.isoformat(),
             }
             for row in rows
         ],
-        "total": len(rows),
+        "total": total,
     }
 
 
-@router.delete("/history/{history_id}")
+@router.delete("/me/history/{history_id}")
 async def delete_history_entry(
     history_id: str,
     user: User = Depends(get_current_user),
@@ -73,7 +81,7 @@ async def delete_history_entry(
     return {"status": "ok"}
 
 
-@router.delete("/history")
+@router.delete("/me/history")
 async def clear_history(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

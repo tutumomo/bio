@@ -58,14 +58,14 @@
 | API-02 | Phase 2 | Pending |
 | API-03 | Phase 4 | Pending |
 | API-04 | Phase 2 | Pending |
-| AUTH-01 | Phase 3 | Pending |
-| AUTH-02 | Phase 3 | Pending |
+| AUTH-01 | Phase 3 | Complete |
+| AUTH-02 | Phase 3 | Complete |
 | AUTH-03 | Phase 3 | Pending |
 | UI-01 | Phase 1 | Pending |
 | UI-02 | Phase 1/2 | Pending |
 | UI-03 | Phase 2 | Pending |
 | UI-04 | Phase 2 | Pending |
-| UI-05 | Phase 4 | Pending |
+| UI-05 | Phase 4 | Complete |
 | UI-06 | Phase 3 | Pending |
 | UI-07 | Phase 4 | Pending |
 | DEPLOY-01 | Phase 5 | Pending |

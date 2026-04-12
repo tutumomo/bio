@@ -1,8 +1,9 @@
 import asyncio
 import httpx
 from typing import Dict, List, Optional
+from backend.core.resilience import retry_http
 
-REGULOMEDB_API = "https://regulomedb.org/regulome/search"
+REGULOMEDB_API = "https://regulomedb.org/regulome-search/"
 
 
 class RegulomeDBClient:
@@ -12,30 +13,41 @@ class RegulomeDBClient:
     async def get_regulome_scores(self, rsids: List[str]) -> Dict[str, Optional[str]]:
         if not rsids:
             return {}
-        tasks = [self._fetch_single(rsid) for rsid in rsids]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-        scores: Dict[str, Optional[str]] = {}
-        for rsid, result in zip(rsids, results):
-            if isinstance(result, Exception):
-                scores[rsid] = None
-            else:
-                scores[rsid] = result
+        
+        chunk_size = 200
+        scores: Dict[str, Optional[str]] = {rsid: None for rsid in rsids}
+        
+        # Batch rsids in chunks to avoid URL length issues
+        for i in range(0, len(rsids), chunk_size):
+            batch = rsids[i : i + chunk_size]
+            try:
+                batch_results = await self._fetch_batch(batch)
+                scores.update(batch_results)
+            except Exception:
+                # For RegulomeDB, we can afford to return None if it fails even after retries
+                # as requested by "Return empty results or meaningful error objects"
+                pass
+            
         return scores
 
-    async def _fetch_single(self, rsid: str) -> Optional[str]:
-        url = f"{REGULOMEDB_API}?regions={rsid}&genome=GRCh38&format=json"
+    @retry_http(attempts=3)
+    async def _fetch_batch(self, rsids: List[str]) -> Dict[str, Optional[str]]:
+        regions = " ".join(rsids)
+        url = f"{REGULOMEDB_API}?regions={regions}&genome=GRCh38&format=json"
+        
         async with self._semaphore:
-            async with httpx.AsyncClient(timeout=30) as client:
+            async with httpx.AsyncClient(timeout=60) as client:
                 resp = await client.get(url)
-                if resp.status_code != 200:
-                    return None
+                resp.raise_for_status()
                 data = resp.json()
+        
+        batch_scores: Dict[str, Optional[str]] = {rsid: None for rsid in rsids}
         variants = data.get("variants", [])
-        if not variants:
-            return None
         for variant in variants:
-            ranking = variant.get("regulome_score", {})
-            rank = ranking.get("ranking")
-            if rank:
-                return str(rank)
-        return None
+            ranking = variant.get("regulome_score", {}).get("ranking")
+            if ranking:
+                variant_rsids = variant.get("rsids", [])
+                for v_rsid in variant_rsids:
+                    if v_rsid in batch_scores:
+                        batch_scores[v_rsid] = str(ranking)
+        return batch_scores

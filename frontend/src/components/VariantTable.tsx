@@ -40,18 +40,18 @@ export function VariantTable({ variants }: { variants: Variant[] }) {
     () => [
       columnHelper.accessor("gene_symbol", {
         header: "Gene",
-        cell: (info) => <span className="font-bold text-[#002045] text-sm">{info.getValue() ?? "N/A"}</span>,
+        cell: (info) => <span className="font-bold text-[#002045] dark:text-slate-100 text-sm">{info.getValue() ?? "N/A"}</span>,
         size: 80,
       }),
       columnHelper.accessor("rsid", {
         header: "SNP",
-        cell: (info) => <span className="font-mono text-sm text-blue-700">{info.getValue()}</span>,
+        cell: (info) => <span className="font-mono text-sm text-blue-700 dark:text-blue-400">{info.getValue()}</span>,
         size: 120,
       }),
       columnHelper.accessor("consequence", {
         header: "Consequence",
         cell: (info) => (
-          <span className="text-xs text-slate-700">{info.getValue()?.replace(/_/g, " ") ?? "N/A"}</span>
+          <span className="text-xs text-slate-700 dark:text-slate-300">{info.getValue()?.replace(/_/g, " ") ?? "N/A"}</span>
         ),
         size: 150,
       }),
@@ -69,13 +69,13 @@ export function VariantTable({ variants }: { variants: Variant[] }) {
         header: "GERP++",
         cell: (info) => {
           const v = info.getValue();
-          return <span className="font-mono text-sm">{v !== null ? v.toFixed(2) : "N/A"}</span>;
+          return <span className="font-mono text-sm text-slate-600 dark:text-slate-400">{v !== null ? v.toFixed(2) : "N/A"}</span>;
         },
         size: 80,
       }),
       columnHelper.accessor("regulome_rank", {
         header: "RegulomeDB",
-        cell: (info) => <span className="font-mono text-sm">{info.getValue() ?? "N/A"}</span>,
+        cell: (info) => <span className="font-mono text-sm text-slate-600 dark:text-slate-400">{info.getValue() ?? "N/A"}</span>,
         size: 100,
       }),
       columnHelper.display({
@@ -115,16 +115,16 @@ export function VariantTable({ variants }: { variants: Variant[] }) {
   });
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
       <div ref={tableContainerRef} className="overflow-auto max-h-[600px]">
         <table className="w-full text-left border-collapse">
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="bg-slate-50">
+              <tr key={headerGroup.id} className="bg-slate-50 dark:bg-slate-800">
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="px-4 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest cursor-pointer select-none hover:text-slate-700 bg-slate-50"
+                    className="px-4 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200 bg-slate-50 dark:bg-slate-800"
                     style={{ width: header.getSize() }}
                     onClick={header.column.getToggleSortingHandler()}
                   >
@@ -149,8 +149,12 @@ export function VariantTable({ variants }: { variants: Variant[] }) {
                   key={row.id}
                   data-index={virtualRow.index}
                   ref={(node) => virtualizer.measureElement(node)}
-                  className={`hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-50 ${
-                    isHighImpact ? "bg-red-50" : isHighCadd ? "bg-orange-50/20" : ""
+                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer border-b border-slate-50 dark:border-slate-800 ${
+                    isHighImpact 
+                      ? "bg-red-50 dark:bg-red-900/20" 
+                      : isHighCadd 
+                        ? "bg-orange-50/20 dark:bg-orange-900/20" 
+                        : ""
                   }`}
                   style={{
                     position: "absolute",
@@ -174,14 +178,14 @@ export function VariantTable({ variants }: { variants: Variant[] }) {
           </tbody>
         </table>
       </div>
-      <div className="px-4 py-2 bg-slate-50 text-xs text-slate-500 border-t border-slate-100 flex justify-between items-center">
+      <div className="px-4 py-2 bg-slate-50 dark:bg-slate-900 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
         <span>Showing {variants.length} variants</span>
         <button
           onClick={handleExportCSV}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all shadow-sm active:scale-95"
         >
           <svg
-            className="w-3.5 h-3.5 text-slate-500"
+            className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

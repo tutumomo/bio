@@ -34,34 +34,9 @@ async def get_gene_variants(
         "impact": impact,
         "regulome_max": regulome_max,
     }
-    raw = await pipeline.get_variants_cached(gene_symbol, ensembl_id, filters, page, limit, db)
-
-    filtered = raw
-    if cadd_min is not None:
-        filtered = [v for v in filtered if v.get("cadd_score") is not None and v["cadd_score"] >= cadd_min]
-    if cadd_max is not None:
-        filtered = [v for v in filtered if v.get("cadd_score") is not None and v["cadd_score"] <= cadd_max]
-    if gerp_min is not None:
-        filtered = [v for v in filtered if v.get("gerp_score") is not None and v["gerp_score"] >= gerp_min]
-    if consequence:
-        cons_list = [c.strip() for c in consequence.split(",")]
-        filtered = [v for v in filtered if v.get("consequence") in cons_list]
-    if impact:
-        impact_list = [i.strip() for i in impact.split(",")]
-        filtered = [v for v in filtered if v.get("impact") in impact_list]
-    if regulome_max is not None:
-        def rank_value(rank):
-            if rank is None:
-                return 99
-            try:
-                return int(rank[0])
-            except (ValueError, IndexError):
-                return 99
-        filtered = [v for v in filtered if rank_value(v.get("regulome_rank")) <= regulome_max]
-
-    total = len(filtered)
-    start = (page - 1) * limit
-    page_data = filtered[start: start + limit]
+    result = await pipeline.get_variants_cached(gene_symbol, ensembl_id, filters, page, limit, db)
+    total = result["total"]
+    page_data = result["variants"]
 
     variants = [
         VariantResponse(

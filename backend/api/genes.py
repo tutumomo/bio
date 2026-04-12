@@ -7,7 +7,7 @@ from sqlalchemy import select, desc, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.core.database import get_db
 from backend.core.rate_limiter import limiter
-from backend.schemas.gene import GeneResponse, GeneSearchResult
+from backend.schemas.gene import GeneResponse, GeneSearchResult, TissueExpressionResult, TissueExpressionEntry
 from backend.schemas.string_partner import StringPartner, StringPartnersResult
 from backend.services.gene_pipeline import GenePipeline
 from backend.services.string_db import StringDBClient
@@ -100,8 +100,8 @@ async def autocomplete(
     q: str = Query(..., min_length=1),
     db: AsyncSession = Depends(get_db),
 ):
-    results = await pipeline.search_genes_cached(q, db)
-    return [{"symbol": g["symbol"], "name": g.get("name") or g.get("full_name", "")} for g in results[:10]]
+    results = await pipeline.autocomplete_genes(q, db)
+    return results
 
 
 @router.get("/{gene_symbol}/string-partners", response_model=StringPartnersResult)
@@ -117,4 +117,25 @@ async def get_string_partners(
         partners=partners,
         total=len(partners),
         string_search_url="https://string-db.org/cgi/network?identifiers={}&species=9606".format(gene_symbol),
+    )
+
+
+@router.get("/{gene_symbol}/expression", response_model=TissueExpressionResult)
+async def get_tissue_expression(
+    gene_symbol: str,
+    ensembl_id: Optional[str] = Query(None, description="Optional Ensembl ID for efficiency"),
+):
+    """Fetch tissue-specific median gene expression data (TPM) from GTEx/Ensembl."""
+    if not ensembl_id:
+        ensembl_id = await pipeline.ensembl.get_ensembl_id(gene_symbol)
+        
+    if not ensembl_id:
+        raise HTTPException(status_code=404, detail=f"Ensembl ID not found for {gene_symbol}")
+
+    expression_raw = await pipeline.get_tissue_expression(gene_symbol, ensembl_id)
+        
+    return TissueExpressionResult(
+        gene_symbol=gene_symbol,
+        ensembl_id=ensembl_id,
+        expression=[TissueExpressionEntry(**e) for e in expression_raw],
     )

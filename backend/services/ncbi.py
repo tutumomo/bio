@@ -1,6 +1,7 @@
 import asyncio
 import httpx
 from backend.core.config import settings
+from backend.core.resilience import retry_http
 
 NCBI_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 
@@ -10,6 +11,7 @@ class NCBIClient:
         self._semaphore = asyncio.Semaphore(10 if settings.ncbi_api_key else 3)
         self._api_key_param = f"&api_key={settings.ncbi_api_key}" if settings.ncbi_api_key else ""
 
+    @retry_http(attempts=3)
     async def search_genes(self, query: str, max_results: int = 20) -> list:
         url = (
             f"{NCBI_BASE}/esearch.fcgi?db=gene"
@@ -24,6 +26,7 @@ class NCBIClient:
                 data = resp.json()
         return data.get("esearchresult", {}).get("idlist", [])
 
+    @retry_http(attempts=3)
     async def get_gene_summaries(self, gene_ids: list) -> list:
         if not gene_ids:
             return []

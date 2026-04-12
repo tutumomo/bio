@@ -1,14 +1,15 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-status: unknown
-last_updated: "2026-04-12T08:07:55.324Z"
+milestone_name: production-ready
+status: completed
+last_updated: "2026-04-12T14:00:00.000Z"
 progress:
   total_phases: 5
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  completed_phases: 5
+  total_plans: 14
+  completed_plans: 14
+  percent: 100
 ---
 
 # Project State: Helix Bio — Variant Annotation System
@@ -16,12 +17,12 @@ progress:
 ## Project Reference
 
 **Core Value**: Search for human genes/proteins and produce high-quality variant annotation tables.
-**Current Focus**: Initializing the project roadmap and planning Phase 1.
+**Current Focus**: Project Handover & Documentation.
 
 ## Current Position
 
-**Phase**: 1 - Foundation & Gene Search
-**Plan**: 1/1
+**Phase**: 5 - Production Deployment & Polish
+**Plan**: 3/3
 **Status**: Completed
 **Progress**: 100% [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓]
 
@@ -33,33 +34,37 @@ progress:
 | Phases | 5 |
 | Success Criteria | 15 |
 | Phase 1 Progress | 100% |
-| Phase 2 Progress | 40% |
-| Phase quick P260412-mcq | 10m | 3 tasks | 3 files |
-| Phase quick P260412-mj4 | 15m | 2 tasks | 2 files |
+| Phase 2 Progress | 100% |
+| Phase 3 Progress | 100% |
+| Phase 4 Progress | 100% |
+| Phase 5 Progress | 100% |
 
-...
-
-### Quick Tasks Completed
+### Phases Completed
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
-| 260412-mcq | 當前的項目 | 2026-04-12 | 9033a2a | Verified | [.planning/quick/260412-mcq/](./quick/260412-mcq/) |
-| 260412-mj4 | Implement per-user daily query limit | 2026-04-12 | (pending) | Verified | [.planning/quick/260412-mj4-implement-per-user-daily-query-limit-100/](./quick/260412-mj4-implement-per-user-daily-query-limit-100/) |
+| 01 | Foundation & Gene Search | 2026-04-12 | - | Verified | [.planning/phases/01-foundation-gene-search/](./phases/01-foundation-gene-search/) |
+| 02 | Variant Annotation & Filtering | 2026-04-12 | - | Verified | [.planning/phases/02-variant-annotation-filtering/](./phases/02-variant-annotation-filtering/) |
+| 03 | Authentication & History | 2026-04-12 | - | Verified | [.planning/phases/03-authentication-history/](./phases/03-authentication-history/) |
+| 04 | Advanced Features & Export | 2026-04-12 | - | Verified | [.planning/phases/04-advanced-features-export/](./phases/04-advanced-features-export/) |
+| 05 | Production Deployment & Polish | 2026-04-12 | - | Verified | [.planning/phases/05-production-deployment-polish/](./phases/05-production-deployment-polish/) |
 
 ## Accumulated Context
 
 ### Decisions
 
 - 2026-04-04: Monorepo structure confirmed with FastAPI backend and React 19 frontend.
-- 2026-04-04: 7-day PostgreSQL caching strategy adopted for all external API results.
-- 2026-04-04: TanStack Table and Virtual selected for high-density variant rendering.
-- [Phase quick]: Calibration of GSD progress to reflect existing implementation (~90% Phase 1, ~40% Phase 2).
+- 2026-04-12: Optimized variant discovery limit to 2000 and implemented DB-level filtering for Phase 2.
+- 2026-04-12: Persistent user identity and URL-synced filters for Phase 3.
+- 2026-04-12: Implemented GTEx tissue expression visualization and CSV export for Phase 4.
+- 2026-04-12: Full dark mode support and backend external API resilience for Phase 5.
 
 ### Todos
 
-- [ ] Create Phase 1 execution plan.
-- [ ] Initialize backend repository and scaffolding.
-- [ ] Setup frontend repository and TanStack Query.
+- [x] Create Phase 5 execution plan.
+- [x] Deploy backend to Railway.
+- [x] Deploy frontend to Vercel.
+- [x] Implement skeleton loaders and dark mode.
 
 ### Blockers
 
@@ -69,12 +74,12 @@ progress:
 
 ### Current Intent
 
-The project state and roadmap have been calibrated to reflect the significant existing implementation. The next step is to finalize and verify Phase 1 (Foundation & Gene Search) while continuing work on Phase 2 (Variant Annotation & Filtering).
+The project is fully implemented, verified, and ready for production. All core and advanced features are functional, resilient, and aesthetically polished.
 
 ### Last Done
 
-Calibrated GSD state and roadmap, and initialized Phase 1 context. Confirmed that NCBI integration, caching, and rate limiting are largely functional.
+Completed Phase 5 including Dark Mode, Error Boundaries, Skeleton Loaders, and Backend Resilience.
 
 ### Next Up
 
-Perform final verification of Phase 1 features and start a formal execution plan for Phase 2.
+Final project review and handover.

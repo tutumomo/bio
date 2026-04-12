@@ -2,6 +2,7 @@ import asyncio
 from typing import List, Optional
 
 import httpx
+from backend.core.resilience import retry_http
 
 ENSEMBL_REST = "https://rest.ensembl.org"
 
@@ -10,6 +11,7 @@ class EnsemblClient:
     def __init__(self):
         self._semaphore = asyncio.Semaphore(15)
 
+    @retry_http(attempts=3)
     async def get_ensembl_id(self, gene_symbol: str) -> Optional[str]:
         url = f"{ENSEMBL_REST}/xrefs/symbol/homo_sapiens/{gene_symbol}"
         async with self._semaphore:
@@ -25,6 +27,7 @@ class EnsemblClient:
                 return entry["id"]
         return data[0]["id"] if data else None
 
+    @retry_http(attempts=3)
     async def get_variants_for_gene(self, ensembl_id: str, limit: Optional[int] = None) -> List[str]:
         url = f"{ENSEMBL_REST}/overlap/id/{ensembl_id}?feature=variation"
         async with self._semaphore:
@@ -38,6 +41,7 @@ class EnsemblClient:
             rsids = rsids[:limit]
         return rsids
 
+    @retry_http(attempts=3)
     async def get_tissue_expression(self, ensembl_id: str) -> List[dict]:
         """
         Fetches tissue-specific median gene expression data from the GTEx v8 public API.

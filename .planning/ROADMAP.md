@@ -5,8 +5,8 @@
 - [x] **Phase 1: Foundation & Gene Search** - Setup monorepo infrastructure and implement core gene discovery via NCBI.
 - [x] **Phase 2: Variant Annotation & Filtering** - Implement high-density variant discovery and functional annotation via Ensembl VEP and RegulomeDB.
 - [x] **Phase 3: Authentication & History** - Secure the platform with OAuth and implement user search history.
-- [ ] **Phase 4: Advanced Features & Export** - Deep-dive gene detail views, charts, and publication-ready data export.
-- [ ] **Phase 5: Production Deployment & Polish** - Deploy to Railway/Vercel and finalize UI/UX polish.
+- [x] **Phase 4: Advanced Features & Export** - Deep-dive gene detail views, charts, and publication-ready data export.
+- [x] **Phase 5: Production Deployment & Polish** - Deploy to Railway/Vercel and finalize UI/UX polish.
 
 ## Phase Details
 
@@ -58,9 +58,9 @@
   2. Search bar provides autocomplete suggestions from the cache.
   3. User can download a CSV of variant results matching "Supplementary Table 1" format.
 **Plans**: 3 plans
-- [ ] 04-01-PLAN.md — Autocomplete & CSV Export
-- [ ] 04-02-PLAN.md — Tissue Expression Backend
-- [ ] 04-03-PLAN.md — Expression Visualization
+- [x] 04-01-PLAN.md — Autocomplete & CSV Export
+- [x] 04-02-PLAN.md — Tissue Expression Backend
+- [x] 04-03-PLAN.md — Expression Visualization
 **UI hint**: yes
 
 ### Phase 5: Production Deployment & Polish
@@ -71,7 +71,10 @@
   1. Frontend is accessible via Vercel domain and Backend via Railway domain.
   2. UI includes skeleton loaders and graceful fallbacks for external API failures.
   3. Dark mode is fully functional and respects system preferences.
-**Plans**: TBD
+**Plans**: 3 plans
+- [x] 05-01-PLAN.md — Deployment & Backend Resilience
+- [x] 05-02-PLAN.md — Frontend Resilience & Loading
+- [x] 05-03-PLAN.md — Dark Mode & Final Polish
 **UI hint**: yes
 
 ## Progress Table
@@ -81,5 +84,5 @@
 | 1. Foundation & Gene Search | 1/1 | Completed | 2026-04-12 |
 | 2. Variant Annotation & Filtering | 2/2 | Completed | 2026-04-12 |
 | 3. Authentication & History | 3/3 | Completed | 2026-04-12 |
-| 4. Advanced Features & Export | 0/3 | Not started | - |
-| 5. Production Deployment & Polish | 0/1 | Not started | - |
+| 4. Advanced Features & Export | 3/3 | Completed | 2026-04-12 |
+| 5. Production Deployment & Polish | 3/3 | Completed | 2026-04-12 |

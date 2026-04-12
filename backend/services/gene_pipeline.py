@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta, timezone
-from typing import List, Dict, Optional
-from sqlalchemy import select
+from typing import List, Dict, Optional, Any, Tuple
+from sqlalchemy import select, func, Integer
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.services.ensembl import EnsemblClient
 from backend.services.ncbi import NCBIClient
@@ -108,8 +108,32 @@ class GenePipeline:
 
         return cached_results
 
+    async def autocomplete_genes(self, q: str, db: AsyncSession) -> List[Dict]:
+        if not q or len(q) < 2:
+            return []
+        
+        stmt = (
+            select(GeneCache)
+            .where(
+                (GeneCache.symbol.ilike(f"{q}%")) | (GeneCache.full_name.ilike(f"%{q}%"))
+            )
+            .limit(10)
+        )
+        result = await db.execute(stmt)
+        rows = result.scalars().all()
+        
+        return [
+            {
+                "symbol": row.symbol,
+                "name": row.full_name,
+                "ncbi_id": row.ncbi_id,
+                "ensembl_id": row.ensembl_id,
+            }
+            for row in rows
+        ]
+
     async def get_variants_annotated(
-        self, gene_symbol: str, ensembl_id: str, limit: int = 500
+        self, gene_symbol: str, ensembl_id: str, limit: int = 2000
     ) -> List[Dict]:
         rsids = await self.ensembl.get_variants_for_gene(ensembl_id, limit=limit)
         if not rsids:
@@ -148,42 +172,25 @@ class GenePipeline:
         page: int,
         limit: int,
         db: AsyncSession,
-    ) -> List[Dict]:
+    ) -> Dict[str, Any]:
         # Determine gene_id by looking up cache
         stmt = select(GeneCache).where(GeneCache.symbol.ilike(gene_symbol))
         result = await db.execute(stmt)
         gene_row = result.scalar_one_or_none()
 
-        cached_variants: Optional[List[Dict]] = None
+        is_missing_or_stale = (gene_row is None) or _is_stale(gene_row.fetched_at)
+        
+        # Double check if variants exist even if gene_row is not stale
+        if not is_missing_or_stale:
+            stmt_exists = select(func.count(VariantCache.rsid)).where(VariantCache.gene_id == gene_row.gene_id)
+            res_exists = await db.execute(stmt_exists)
+            if res_exists.scalar() == 0:
+                is_missing_or_stale = True
 
-        if gene_row is not None and not _is_stale(gene_row.fetched_at):
-            stmt2 = select(VariantCache).where(VariantCache.gene_id == gene_row.gene_id)
-            result2 = await db.execute(stmt2)
-            rows = result2.scalars().all()
-            if rows:
-                cached_variants = [
-                    {
-                        "rsid": r.rsid,
-                        "gene_symbol": gene_symbol,
-                        "consequence": r.consequence,
-                        "impact": r.impact,
-                        "cadd_score": r.cadd_score,
-                        "gerp_score": r.gerp_score,
-                        "regulome_rank": r.regulome_rank,
-                        "protein_position": r.protein_position,
-                        "amino_acid_change": r.amino_acid_change,
-                    }
-                    for r in rows
-                ]
-
-        if cached_variants is None:
-            raw = await self.get_variants_annotated(gene_symbol, ensembl_id, limit=500)
-
-            # Determine gene_id for caching
-            if gene_row is not None:
-                gene_id = gene_row.gene_id
-            else:
-                gene_id = "{}_unknown".format(gene_symbol)
+        if is_missing_or_stale:
+            # Fetch all up to a reasonable limit for cache
+            raw = await self.get_variants_annotated(gene_symbol, ensembl_id, limit=2000)
+            gene_id = gene_row.gene_id if gene_row else f"{gene_symbol}_unknown"
 
             for v in raw:
                 variant_obj = VariantCache(
@@ -199,7 +206,75 @@ class GenePipeline:
                     fetched_at=datetime.now(timezone.utc).replace(tzinfo=None),
                 )
                 await db.merge(variant_obj)
+            
+            if gene_row:
+                gene_row.fetched_at = datetime.now(timezone.utc).replace(tzinfo=None)
+            
             await db.commit()
-            cached_variants = raw
+        else:
+            gene_id = gene_row.gene_id
 
-        return cached_variants
+        # Query with filters
+        query = select(VariantCache).where(VariantCache.gene_id == gene_id)
+        
+        if filters.get("cadd_min") is not None:
+            query = query.where(VariantCache.cadd_score >= filters["cadd_min"])
+        if filters.get("cadd_max") is not None:
+            query = query.where(VariantCache.cadd_score <= filters["cadd_max"])
+        if filters.get("gerp_min") is not None:
+            query = query.where(VariantCache.gerp_score >= filters["gerp_min"])
+        if filters.get("consequence"):
+            cons_list = [c.strip() for c in filters["consequence"].split(",") if c.strip()]
+            if cons_list:
+                query = query.where(VariantCache.consequence.in_(cons_list))
+        if filters.get("impact"):
+            impact_list = [i.strip() for i in filters["impact"].split(",") if i.strip()]
+            if impact_list:
+                query = query.where(VariantCache.impact.in_(impact_list))
+        if filters.get("regulome_max") is not None:
+            # Handle regulome_rank string to int conversion safely in SQL
+            # We use the first character of the string.
+            # Coalesce to 99 for nulls to match python logic
+            rank_char = func.substring(VariantCache.regulome_rank, 1, 1)
+            query = query.where(
+                func.coalesce(func.cast(rank_char, Integer), 99) <= filters["regulome_max"]
+            )
+
+        # Get total count before pagination
+        count_stmt = select(func.count()).select_from(query.subquery())
+        count_res = await db.execute(count_stmt)
+        total = count_res.scalar()
+
+        # Apply pagination
+        query = query.offset((page - 1) * limit).limit(limit)
+        result = await db.execute(query)
+        rows = result.scalars().all()
+
+        variants = [
+            {
+                "rsid": r.rsid,
+                "gene_symbol": gene_symbol,
+                "consequence": r.consequence,
+                "impact": r.impact,
+                "cadd_score": r.cadd_score,
+                "gerp_score": r.gerp_score,
+                "regulome_rank": r.regulome_rank,
+                "protein_position": r.protein_position,
+                "amino_acid_change": r.amino_acid_change,
+            }
+            for r in rows
+        ]
+
+        return {"variants": variants, "total": total}
+
+    async def get_tissue_expression(self, gene_symbol: str, ensembl_id: Optional[str] = None) -> List[Dict]:
+        """
+        Orchestrates fetching tissue expression data for a gene.
+        """
+        if not ensembl_id:
+            ensembl_id = await self.ensembl.get_ensembl_id(gene_symbol)
+        
+        if not ensembl_id:
+            return []
+            
+        return await self.ensembl.get_tissue_expression(ensembl_id)

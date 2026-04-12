@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { ExternalLink, ChevronRight, Network } from "lucide-react";
 import { api } from "@/lib/api";
 import { SourceLinkButtons } from "@/components/SourceLinkButtons";
-import { SkeletonTable } from "@/components/SkeletonTable";
+import SkeletonTable from "@/components/SkeletonTable";
+import { ErrorState } from "@/components/ErrorState";
 import type { Pathway, PathwayProtein } from "@/types";
 
 interface PathwayListProps {
@@ -63,13 +64,17 @@ interface PathwayProteinsTableProps {
 }
 
 function PathwayProteinsTable({ pathway }: PathwayProteinsTableProps) {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["pathway-proteins", pathway.pathway_id],
     queryFn: () => api.getPathwayProteins(pathway.pathway_id),
     staleTime: 10 * 60_000,
   });
 
-  if (isLoading) return <SkeletonTable rows={8} cols={4} />;
+  if (isLoading) return <SkeletonTable rows={8} columns={4} />;
+
+  if (isError) {
+    return <ErrorState error={error} onRetry={() => refetch()} title="Pathway proteins error" />;
+  }
 
   const proteins: PathwayProtein[] = data?.proteins ?? [];
 

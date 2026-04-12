@@ -38,8 +38,8 @@ export function SearchBar() {
             onClick={() => setMode(value)}
             className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all ${
               mode === value
-                ? "bg-white text-[#002045] shadow"
-                : "text-white/60 hover:text-white"
+                ? "bg-white dark:bg-slate-800 text-[#002045] dark:text-slate-100 shadow"
+                : "text-white/60 hover:text-white dark:text-slate-400 dark:hover:text-slate-200"
             }`}
           >
             <Icon className="w-3.5 h-3.5" />
@@ -51,12 +51,12 @@ export function SearchBar() {
       {/* Search input */}
       <div className="relative">
         <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-blue-600 rounded-2xl blur opacity-25" />
-        <div className="relative bg-white flex items-center p-2 rounded-2xl shadow-xl">
+        <div className="relative bg-white dark:bg-slate-900 flex items-center p-2 rounded-2xl shadow-xl border border-transparent dark:border-slate-800">
           <Search className="text-slate-400 ml-4 w-5 h-5 shrink-0" />
           <input
             ref={inputRef}
             type="text"
-            className="w-full border-none focus:ring-0 bg-transparent py-4 px-4 text-slate-900 text-lg placeholder:text-slate-400"
+            className="w-full border-none focus:ring-0 bg-transparent py-4 px-4 text-slate-900 dark:text-slate-100 text-lg placeholder:text-slate-400"
             placeholder={placeholder}
             value={input}
             onChange={(e) => {
@@ -69,7 +69,7 @@ export function SearchBar() {
           />
           <button
             onClick={() => handleSearch()}
-            className="bg-[#002045] text-white px-8 py-4 rounded-xl font-bold tracking-tight hover:opacity-90 transition-all active:scale-95 shrink-0"
+            className="bg-[#002045] dark:bg-blue-600 text-white px-8 py-4 rounded-xl font-bold tracking-tight hover:opacity-90 transition-all active:scale-95 shrink-0"
           >
             Search
           </button>
@@ -77,15 +77,15 @@ export function SearchBar() {
 
         {/* Gene autocomplete (only in gene mode) */}
         {mode === "gene" && showSuggestions && suggestions.length > 0 && (
-          <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
+          <div className="absolute z-50 w-full mt-2 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-100 dark:border-slate-800 overflow-hidden">
             {suggestions.map((s: { symbol: string; name: string }) => (
               <button
                 key={s.symbol}
-                className="w-full px-6 py-3 text-left hover:bg-slate-50 flex items-center gap-3"
+                className="w-full px-6 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-3"
                 onMouseDown={() => handleSearch(s.symbol)}
               >
-                <span className="font-bold text-[#002045]">{s.symbol}</span>
-                <span className="text-sm text-slate-500 truncate">{s.name}</span>
+                <span className="font-bold text-[#002045] dark:text-slate-100">{s.symbol}</span>
+                <span className="text-sm text-slate-500 dark:text-slate-400 truncate">{s.name}</span>
               </button>
             ))}
           </div>

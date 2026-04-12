@@ -18,3 +18,14 @@ class GeneSearchResult(BaseModel):
     genes: List[GeneResponse]
     query: str
     total: int
+
+
+class TissueExpressionEntry(BaseModel):
+    tissue: str
+    tpm: float
+
+
+class TissueExpressionResult(BaseModel):
+    gene_symbol: str
+    ensembl_id: str
+    expression: List[TissueExpressionEntry]

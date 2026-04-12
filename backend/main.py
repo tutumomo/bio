@@ -1,5 +1,7 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+import httpx
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -23,6 +25,41 @@ app = FastAPI(title="Helix Bio API", lifespan=lifespan)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+@app.exception_handler(httpx.HTTPStatusError)
+async def httpx_status_exception_handler(request: Request, exc: httpx.HTTPStatusError):
+    status_code = 502 # Bad Gateway as default for upstream issues
+    if exc.response.status_code in (503, 504):
+        status_code = exc.response.status_code
+        
+    return JSONResponse(
+        status_code=status_code,
+        content={
+            "error": "Upstream Service Error",
+            "detail": f"The external API returned an error: {exc.response.status_code}",
+            "upstream_status": exc.response.status_code
+        },
+    )
+
+@app.exception_handler(httpx.TimeoutException)
+async def httpx_timeout_exception_handler(request: Request, exc: httpx.TimeoutException):
+    return JSONResponse(
+        status_code=504,
+        content={
+            "error": "Upstream Timeout",
+            "detail": "The external API request timed out."
+        },
+    )
+
+@app.exception_handler(httpx.ConnectError)
+async def httpx_connect_exception_handler(request: Request, exc: httpx.ConnectError):
+    return JSONResponse(
+        status_code=503,
+        content={
+            "error": "Upstream Connection Failed",
+            "detail": "Could not connect to the external API."
+        },
+    )
 
 app.add_middleware(
     CORSMiddleware,

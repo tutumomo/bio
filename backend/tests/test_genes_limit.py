@@ -22,12 +22,14 @@ async def test_search_genes_daily_limit():
     
     # Mock dependencies
     async def override_get_optional_user():
-        return {"sub": str(user_id), "email": "test@example.com"}
+        return mock_user
 
     mock_db = AsyncMock()
-    # Mock the select(User) result
+    # Explicitly make add sync
+    mock_db.add = MagicMock()
+    # Mock the select(SearchHistory) result to return no duplicate (empty scalar_one_or_none)
     mock_result = MagicMock()
-    mock_result.scalar_one_or_none.return_value = mock_user
+    mock_result.scalar_one_or_none.return_value = None
     mock_db.execute.return_value = mock_result
 
     async def override_get_db():

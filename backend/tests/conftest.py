@@ -7,13 +7,19 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy import MetaData
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from backend.core.database import Base
+from backend.core.database import Base, get_db
 from backend.main import app
 
 TEST_DB_URL = "sqlite+aiosqlite:///./test.db"
 
 engine = create_async_engine(TEST_DB_URL, echo=False)
 TestSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+async def override_get_db():
+    async with TestSessionLocal() as session:
+        yield session
+
+app.dependency_overrides[get_db] = override_get_db
 
 # Tables compatible with SQLite (excludes PostgreSQL-specific types like JSONB/UUID)
 SQLITE_COMPATIBLE_TABLES = {"gene_cache", "variant_cache"}

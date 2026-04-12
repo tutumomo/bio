@@ -26,4 +26,6 @@ class VariantCache(Base):
     __table_args__ = (
         Index("idx_variant_gene", "gene_id"),
         Index("idx_variant_cadd", "cadd_score"),
+        Index("idx_variant_impact", "impact"),
+        Index("idx_variant_consequence", "consequence"),
     )
