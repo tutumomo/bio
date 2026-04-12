@@ -1,7 +1,9 @@
 import uuid
+from datetime import date
 from typing import Optional, List
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from starlette.requests import Request
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.core.database import get_db
 from backend.core.rate_limiter import limiter
@@ -10,7 +12,7 @@ from backend.schemas.string_partner import StringPartner, StringPartnersResult
 from backend.services.gene_pipeline import GenePipeline
 from backend.services.string_db import StringDBClient
 from backend.auth.dependencies import get_optional_user
-from backend.models.user import SearchHistory
+from backend.models.user import SearchHistory, User
 
 router = APIRouter(prefix="/api/genes", tags=["genes"])
 pipeline = GenePipeline()
@@ -46,8 +48,28 @@ async def search_genes(
     ]
 
     if current_user and genes:
+        user_id = uuid.UUID(current_user["sub"])
+        
+        # Enforce per-user daily query limit
+        result = await db.execute(select(User).where(User.id == user_id))
+        user_obj = result.scalar_one_or_none()
+        
+        if user_obj:
+            today = date.today()
+            if user_obj.last_query_date != today:
+                user_obj.daily_query_count = 0
+                user_obj.last_query_date = today
+            
+            if user_obj.daily_query_count >= 100:
+                raise HTTPException(
+                    status_code=429, 
+                    detail="Daily query limit reached (100/day)"
+                )
+            
+            user_obj.daily_query_count += 1
+
         history_entry = SearchHistory(
-            user_id=uuid.UUID(current_user["sub"]),
+            user_id=user_id,
             query=q,
             gene_count=len(genes),
         )
