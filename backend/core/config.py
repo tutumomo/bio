@@ -12,7 +12,11 @@ class Settings(BaseSettings):
     ncbi_api_key: str = ""
     frontend_url: str = "http://localhost:3000"
 
-    model_config = {"env_file": ".env"}
+    @property
+    def cors_origins(self) -> list[str]:
+        return [origin.strip() for origin in self.frontend_url.split(",")]
+
+    model_config = {"env_file": ".env", "extra": "ignore"}
 
 
 settings = Settings()
