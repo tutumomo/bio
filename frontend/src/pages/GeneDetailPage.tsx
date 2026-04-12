@@ -17,6 +17,8 @@ export function GeneDetailPage() {
   const [searchParams] = useSearchParams();
   const ensemblId = searchParams.get("ensembl_id") || "";
   const [filters, setFilters] = useState<VariantFilters>({});
+  const [page, setPage] = useState(1);
+  const limit = 50;
 
   const { data: geneData } = useQuery({
     queryKey: ["gene-detail", geneSymbol],
@@ -29,7 +31,7 @@ export function GeneDetailPage() {
   const geneForVariants: Gene[] = gene
     ? [{ ...gene, ensembl_id: ensemblId || gene.ensembl_id }]
     : [];
-  const { data: variantData, isLoading: variantsLoading } = useVariants(geneForVariants, filters);
+  const { data: variantData, isLoading: variantsLoading } = useVariants(geneForVariants, filters, page, limit);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10">
@@ -87,13 +89,36 @@ export function GeneDetailPage() {
         <h2 className="text-xl font-bold text-[#002045] mb-4">SNP Annotations</h2>
         <div className="flex gap-6">
           <div className="w-64 flex-shrink-0">
-            <FilterPanel filters={filters} onChange={setFilters} />
+            <FilterPanel filters={filters} onChange={(f) => { setFilters(f); setPage(1); }} />
           </div>
           <div className="flex-1">
             {variantsLoading ? (
               <SkeletonTable rows={10} cols={8} />
             ) : variantData?.variants.length ? (
-              <VariantTable variants={variantData.variants} />
+              <>
+                <VariantTable variants={variantData.variants} />
+                {variantData.total > limit && (
+                  <div className="flex items-center justify-between mt-4 px-2">
+                    <button
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                      className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-sm text-slate-500">
+                      Page {page} of {Math.ceil(variantData.total / limit)}
+                    </span>
+                    <button
+                      onClick={() => setPage((p) => p + 1)}
+                      disabled={page >= Math.ceil(variantData.total / limit)}
+                      className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="p-8 text-center bg-slate-50 rounded-xl text-slate-500">
                 No variants found

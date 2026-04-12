@@ -44,6 +44,8 @@ async def callback(provider: str, code: str, response: Response):
                 },
             )
             tokens = token_resp.json()
+            if "access_token" not in tokens:
+                return RedirectResponse(url="{}?auth_error=token_exchange_failed".format(settings.frontend_url))
             user_resp = await client.get(
                 "https://www.googleapis.com/oauth2/v2/userinfo",
                 headers={"Authorization": "Bearer {}".format(tokens['access_token'])},
@@ -68,6 +70,8 @@ async def callback(provider: str, code: str, response: Response):
                 headers={"Accept": "application/json"},
             )
             tokens = token_resp.json()
+            if "access_token" not in tokens:
+                return RedirectResponse(url="{}?auth_error=token_exchange_failed".format(settings.frontend_url))
             user_resp = await client.get(
                 "https://api.github.com/user",
                 headers={"Authorization": "Bearer {}".format(tokens['access_token'])},

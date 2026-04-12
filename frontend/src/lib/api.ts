@@ -41,6 +41,12 @@ export const api = {
 
   getHistory: () => fetchAPI<{ history: HistoryEntry[]; total: number }>("/api/user/history"),
 
+  deleteHistoryEntry: (id: string) =>
+    fetchAPI<{ status: string }>(`/api/user/history/${id}`, { method: "DELETE" }),
+
+  clearHistory: () =>
+    fetchAPI<{ status: string }>("/api/user/history", { method: "DELETE" }),
+
   // Pathway (Reactome)
   searchPathways: (query: string) =>
     fetchAPI<PathwaySearchResult>(`/api/pathways/search?q=${encodeURIComponent(query)}`),

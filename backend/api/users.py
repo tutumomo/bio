@@ -49,6 +49,40 @@ async def get_history(
     }
 
 
+@router.delete("/history/{history_id}")
+async def delete_history_entry(
+    history_id: str,
+    user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    stmt = select(SearchHistory).where(
+        SearchHistory.id == uuid.UUID(history_id),
+        SearchHistory.user_id == uuid.UUID(user["sub"]),
+    )
+    result = await db.execute(stmt)
+    entry = result.scalar_one_or_none()
+    if not entry:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="History entry not found")
+    await db.delete(entry)
+    await db.commit()
+    return {"status": "ok"}
+
+
+@router.delete("/history")
+async def clear_history(
+    user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    from sqlalchemy import delete as sql_delete
+    stmt = sql_delete(SearchHistory).where(
+        SearchHistory.user_id == uuid.UUID(user["sub"])
+    )
+    await db.execute(stmt)
+    await db.commit()
+    return {"status": "ok"}
+
+
 @router.post("/logout")
 async def logout(response: Response):
     response.delete_cookie("access_token")

@@ -66,7 +66,7 @@ async def get_gene_variants(
     variants = [
         VariantResponse(
             rsid=v["rsid"],
-            gene_id=gene_row.gene_id if gene_row else None,
+            gene_id="{}_{}".format(gene_symbol, ensembl_id) if ensembl_id else gene_symbol,
             gene_symbol=v.get("gene_symbol"),
             consequence=v.get("consequence"),
             impact=v.get("impact"),
