@@ -1,8 +1,12 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, Depends
 from fastapi.responses import RedirectResponse
 import httpx
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from backend.auth.jwt import create_access_token
 from backend.core.config import settings
+from backend.core.database import get_db
+from backend.models.user import User
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -30,7 +34,7 @@ async def login(provider: str):
     return {"error": "Unsupported provider"}
 
 @router.get("/callback/{provider}")
-async def callback(provider: str, code: str, response: Response):
+async def callback(provider: str, code: str, response: Response, db: AsyncSession = Depends(get_db)):
     if provider == "google":
         async with httpx.AsyncClient() as client:
             token_resp = await client.post(
@@ -51,13 +55,11 @@ async def callback(provider: str, code: str, response: Response):
                 headers={"Authorization": "Bearer {}".format(tokens['access_token'])},
             )
             user_info = user_resp.json()
-        jwt_token = create_access_token({
-            "sub": user_info["id"],
-            "email": user_info.get("email"),
-            "name": user_info.get("name"),
-            "avatar": user_info.get("picture"),
-            "provider": "google",
-        })
+        
+        provider_id = user_info["id"]
+        email = user_info.get("email")
+        name = user_info.get("name")
+        avatar_url = user_info.get("picture")
     elif provider == "github":
         async with httpx.AsyncClient() as client:
             token_resp = await client.post(
@@ -77,16 +79,45 @@ async def callback(provider: str, code: str, response: Response):
                 headers={"Authorization": "Bearer {}".format(tokens['access_token'])},
             )
             user_info = user_resp.json()
-        jwt_token = create_access_token({
-            "sub": str(user_info["id"]),
-            "email": user_info.get("email"),
-            "name": user_info.get("login"),
-            "avatar": user_info.get("avatar_url"),
-            "provider": "github",
-        })
+        
+        provider_id = str(user_info["id"])
+        email = user_info.get("email")
+        name = user_info.get("login")
+        avatar_url = user_info.get("avatar_url")
     else:
         return {"error": "Unsupported provider"}
 
+    # Common logic to persist user
+    stmt = select(User).where(User.provider == provider, User.provider_id == provider_id)
+    result = await db.execute(stmt)
+    user = result.scalar_one_or_none()
+    
+    if not user:
+        user = User(
+            provider=provider,
+            provider_id=provider_id,
+            email=email,
+            name=name,
+            avatar_url=avatar_url
+        )
+        db.add(user)
+    else:
+        # Update existing fields
+        user.email = email
+        user.name = name
+        user.avatar_url = avatar_url
+    
+    await db.commit()
+    await db.refresh(user)
+    
+    jwt_token = create_access_token({
+        "sub": str(user.id),
+        "email": user.email,
+        "name": user.name,
+        "avatar": user.avatar_url,
+        "provider": user.provider,
+    })
+    
     response = RedirectResponse(url=settings.frontend_url)
     response.set_cookie(
         key="access_token",
