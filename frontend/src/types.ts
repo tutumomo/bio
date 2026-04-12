@@ -60,6 +60,7 @@ export interface HistoryEntry {
   query: string;
   gene_count: number | null;
   variant_count: number | null;
+  filters: VariantFilters | null;
   searched_at: string;
 }
 

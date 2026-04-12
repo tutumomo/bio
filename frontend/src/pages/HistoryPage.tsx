@@ -1,18 +1,23 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
-import { Search, Clock, Trash2 } from "lucide-react";
+import { Search, Clock, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
+import type { HistoryEntry } from "@/types";
 
 export function HistoryPage() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["history"],
-    queryFn: api.getHistory,
+  const [limit] = useState(15);
+  const [offset, setOffset] = useState(0);
+
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["history", limit, offset],
+    queryFn: () => api.getHistory(limit, offset),
     enabled: isAuthenticated,
   });
 
@@ -26,6 +31,20 @@ export function HistoryPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["history"] }),
   });
 
+  const handleReplay = (entry: HistoryEntry) => {
+    const params = new URLSearchParams({ q: entry.query, mode: "gene" });
+    if (entry.filters) {
+      const f = entry.filters;
+      if (f.cadd_min !== undefined) params.set("cadd_min", String(f.cadd_min));
+      if (f.cadd_max !== undefined) params.set("cadd_max", String(f.cadd_max));
+      if (f.gerp_min !== undefined) params.set("gerp_min", String(f.gerp_min));
+      if (f.regulome_max !== undefined) params.set("regulome_max", String(f.regulome_max));
+      if (f.consequence?.length) params.set("consequence", f.consequence.join(","));
+      if (f.impact?.length) params.set("impact", f.impact.join(","));
+    }
+    navigate(`/results?${params.toString()}`);
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
@@ -36,54 +55,93 @@ export function HistoryPage() {
     );
   }
 
+  const total = data?.total ?? 0;
+  const currentPage = Math.floor(offset / limit) + 1;
+  const totalPages = Math.ceil(total / limit);
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-extrabold tracking-tight text-[#002045]">Search History</h1>
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-[#002045]">Search History</h1>
+          <p className="text-sm text-slate-500 mt-1">{total} previous searches</p>
+        </div>
         {data && data.history.length > 0 && (
           <button
-            onClick={() => { if (confirm("Clear all search history?")) clearMutation.mutate(); }}
+            onClick={() => {
+              if (confirm("Clear all search history?")) clearMutation.mutate();
+            }}
             disabled={clearMutation.isPending}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 font-bold"
           >
             <Trash2 className="w-4 h-4" /> Clear All
           </button>
         )}
       </div>
 
-      {isLoading && <div className="animate-pulse space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-16 bg-slate-100 rounded-xl" />)}</div>}
-
-      {data?.history.length === 0 && (
-        <div className="p-12 text-center bg-slate-50 rounded-xl">
-          <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-500">No search history yet. Start by searching for a gene.</p>
+      {isLoading && (
+        <div className="animate-pulse space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-20 bg-slate-100 rounded-xl" />
+          ))}
         </div>
       )}
 
-      <div className="space-y-3">
+      {!isLoading && data?.history.length === 0 && (
+        <div className="p-12 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+          <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-500 font-medium">No search history yet. Start by searching for a gene.</p>
+        </div>
+      )}
+
+      <div className={`space-y-3 transition-opacity ${isFetching ? "opacity-50" : ""}`}>
         {data?.history.map((entry) => (
           <div
             key={entry.id}
-            className="flex items-center gap-2 p-5 bg-white rounded-xl border border-slate-100 hover:shadow-md transition-all"
+            className="group flex items-center gap-2 p-5 bg-white rounded-xl border border-slate-100 hover:shadow-md hover:border-blue-100 transition-all"
           >
             <button
-              onClick={() => navigate(`/results?q=${encodeURIComponent(entry.query)}`)}
+              onClick={() => handleReplay(entry)}
               className="flex-1 flex items-center justify-between text-left"
             >
               <div>
-                <p className="font-bold text-[#002045]">{entry.query}</p>
-                <p className="text-xs text-slate-500 mt-1">
-                  {entry.gene_count ?? 0} genes &middot; {entry.variant_count ?? 0} variants
+                <div className="flex items-center gap-2">
+                  <p className="font-bold text-[#002045] group-hover:text-blue-700 transition-colors">
+                    {entry.query}
+                  </p>
+                  {entry.filters && Object.keys(entry.filters).length > 0 && (
+                    <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded uppercase tracking-wider">
+                      Filtered
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-1 font-medium">
+                  {entry.gene_count ?? 0} genes found &middot; {entry.variant_count ?? 0} variants
                 </p>
               </div>
-              <span className="text-xs text-slate-400">
-                {new Date(entry.searched_at).toLocaleDateString()}
-              </span>
+              <div className="text-right">
+                <p className="text-xs text-slate-400">
+                  {new Date(entry.searched_at).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </p>
+                <p className="text-[10px] text-slate-300 mt-1">
+                  {new Date(entry.searched_at).toLocaleTimeString(undefined, {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              </div>
             </button>
             <button
-              onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(entry.id); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteMutation.mutate(entry.id);
+              }}
               disabled={deleteMutation.isPending}
-              className="p-2 text-slate-400 hover:text-red-500 transition-colors disabled:opacity-50"
+              className="p-2 text-slate-300 hover:text-red-500 transition-colors disabled:opacity-50"
               title="Delete"
             >
               <Trash2 className="w-4 h-4" />
@@ -91,6 +149,29 @@ export function HistoryPage() {
           </div>
         ))}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 pt-4">
+          <button
+            onClick={() => setOffset((prev) => Math.max(0, prev - limit))}
+            disabled={offset === 0}
+            className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <span className="text-sm font-bold text-slate-600">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setOffset((prev) => prev + limit)}
+            disabled={offset + limit >= total}
+            className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      )}
     </motion.div>
   );
 }
