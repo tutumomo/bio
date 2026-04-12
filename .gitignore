@@ -18,3 +18,12 @@ frontend/dist/
 
 # DB
 *.db
+
+# Logs
+*_log.txt
+
+# Claude Code local settings
+.claude/
+
+# Graphify cache
+graphify-out/cache/
