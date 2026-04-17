@@ -12,6 +12,11 @@ from backend.schemas.string_partner import StringPartner, StringPartnersResult
 from backend.services.gene_pipeline import GenePipeline
 from backend.services.string_db import StringDBClient
 from backend.auth.dependencies import get_optional_user, check_query_limit, record_search_history
+from backend.models.user import User
+
+router = APIRouter(prefix="/api/genes", tags=["genes"])
+pipeline = GenePipeline()
+string_db = StringDBClient()
 
 @router.get("/search", response_model=GeneSearchResult)
 @limiter.limit("60/minute")
