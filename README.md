@@ -70,10 +70,10 @@ docker-compose up -d db
 ```bash
 cd backend
 pip install -r requirements.txt
-export DATABASE_URL="postgresql+asyncpg://helix:helix@localhost:5432/helix_bio"
+export DATABASE_URL="postgresql+asyncpg://$(whoami)@localhost:5432/helix_bio"
 export JWT_SECRET="dev-secret-key"
-export FRONTEND_URL="http://localhost:3000"
-uvicorn backend.main:app --reload --port 8000
+export FRONTEND_URL="http://localhost:5555"
+uvicorn backend.main:app --reload --port 8001 --host 0.0.0.0
 ```
 
 ### Frontend / 前端
@@ -81,12 +81,12 @@ uvicorn backend.main:app --reload --port 8000
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev -- --port 5555 --host 0.0.0.0
 ```
 
-Open `http://localhost:3000`
+Open `http://localhost:5555`
 
-開啟 `http://localhost:3000`
+開啟 `http://localhost:5555`
 
 ### Environment Variables / 環境變數
 
