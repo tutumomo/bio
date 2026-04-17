@@ -59,23 +59,20 @@
   3. User can download a CSV of variant results matching "Supplementary Table 1" format.
 **Plans**: 3 plans
 - [x] 04-01-PLAN.md — Autocomplete & CSV Export
-- [x] 04-02-PLAN.md — Tissue Expression Backend
-- [x] 04-03-PLAN.md — Expression Visualization
-**UI hint**: yes
+- [x] **Phase 5: Production Deployment & Polish** - Deploy to Railway/Vercel and finalize UI/UX polish.
+- [x] **Phase 6: Security & Consistency Patch** - Unified daily query limits and search history tracking.
 
-### Phase 5: Production Deployment & Polish
-**Goal**: Secure and deploy the application for public access.
-**Depends on**: Phase 4
-**Requirements**: DEPLOY-01, DEPLOY-02
+## Phase Details
+...
+### Phase 6: Security & Consistency Patch
+**Goal**: Ensure unified behavior for query limits and history across all search modules.
+**Depends on**: Phase 5
 **Success Criteria** (what must be TRUE):
-  1. Frontend is accessible via Vercel domain and Backend via Railway domain.
-  2. UI includes skeleton loaders and graceful fallbacks for external API failures.
-  3. Dark mode is fully functional and respects system preferences.
-**Plans**: 3 plans
-- [x] 05-01-PLAN.md — Deployment & Backend Resilience
-- [x] 05-02-PLAN.md — Frontend Resilience & Loading
-- [x] 05-03-PLAN.md — Dark Mode & Final Polish
-**UI hint**: yes
+  1. Variants and Pathways endpoints enforce the 100/day daily limit.
+  2. Search history records all types of searches (genes, variants, pathways).
+  3. UI provides explicit feedback for 429 status codes.
+**Plans**: 1 quick plan
+- [x] 260417-unified-tracking — Unified Dependency implementation
 
 ## Progress Table
 
@@ -86,3 +83,5 @@
 | 3. Authentication & History | 3/3 | Completed | 2026-04-12 |
 | 4. Advanced Features & Export | 3/3 | Completed | 2026-04-12 |
 | 5. Production Deployment & Polish | 3/3 | Completed | 2026-04-12 |
+| 6. Security & Consistency Patch | 1/1 | Completed | 2026-04-17 |
+

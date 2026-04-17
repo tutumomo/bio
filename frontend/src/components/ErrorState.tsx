@@ -17,6 +17,9 @@ export function ErrorState({ error, onRetry, title = "Something went wrong" }: E
   if (status === 404) {
     message = "Resource not found";
     description = "The requested data could not be found on our servers.";
+  } else if (status === 429) {
+    message = "Daily Query Limit Exceeded";
+    description = "You've reached your daily limit of 100 queries. Please try again tomorrow or contact support for higher limits.";
   } else if (status && status >= 500) {
     message = "Server is currently unavailable";
     description = "Our backend service is experiencing issues or undergoing maintenance (HTTP " + status + ").";

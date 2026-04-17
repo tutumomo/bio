@@ -12,6 +12,9 @@ router = APIRouter(prefix="/api", tags=["variants"])
 pipeline = GenePipeline()
 
 
+from backend.auth.dependencies import check_query_limit, record_search_history
+from backend.models.user import User
+
 @router.get("/genes/{gene_symbol}/variants", response_model=VariantListResult)
 async def get_gene_variants(
     gene_symbol: str,
@@ -25,7 +28,13 @@ async def get_gene_variants(
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(check_query_limit),
 ):
+    # The 'q' in check_query_limit will be derived from the query param if present, 
+    # but here the primary search is gene_symbol.
+    # However, check_query_limit expects 'q'. We can alias it or just ensure history uses gene_symbol.
+    query_text = f"variants:{gene_symbol}"
+    
     filters = {
         "cadd_min": cadd_min,
         "cadd_max": cadd_max,
@@ -55,6 +64,16 @@ async def get_gene_variants(
         )
         for v in page_data
     ]
+
+    if user:
+        await record_search_history(
+            db=db,
+            user=user,
+            query=query_text,
+            variant_count=total,
+            filters=filters
+        )
+
     return VariantListResult(variants=variants, total=total, page=page, limit=limit)
 
 

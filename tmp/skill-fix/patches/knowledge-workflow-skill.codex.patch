@@ -1,0 +1,71 @@
+--- a/skills/knowledge-workflow/SKILL.md
++++ b/skills/knowledge-workflow/SKILL.md
+@@ -87,6 +87,8 @@
+    - 每個值得沉澱的節點 → 對應一個 concept/ 或 entity/ 頁面
+    - 每條值得沉澱的邊 → 對應頁面間的 `[[wikilinks]]`
+    - 在頁面的 frontmatter 加上 `graphify_source: true` 標記
++   - `graphify_source: true` 不是 frontmatter 的替代品；頁面仍必須滿足 llm-wiki 的基本欄位：`title`、`created`、`updated`、`type`、`tags`、`sources`、`quality`、`source_type`、`domain`
++   - 如果 graphify 來源本身無法可靠提供 `quality` / `source_type`，先標成保守值（通常是 `secondary` / `manual`），並在後續 ingest 或 lint 時回填
+    - 更新 `index.md` 和 `log.md`
+ 
+ 5. **標記已沉澱**
+@@ -107,9 +109,12 @@
+ 
+ 1. **把 Wiki 當素材餵給 Graphify**
+    ```
+-   /graphify ~/wiki/concepts/ ~/wiki/entities/
++   mkdir -p /tmp/wiki-graphify-corpus
++   cp -R ~/wiki/entities ~/wiki/concepts ~/wiki/comparisons ~/wiki/queries /tmp/wiki-graphify-corpus/
++   cd /tmp/wiki-graphify-corpus && /graphify .
+    ```
+-   - 只掃描 Wiki 的二層（不掃 raw/），因為 raw/ 是不可改原始資料
++   - 不要把兩個路徑直接丟給 `/graphify`；這個技能假設單一 corpus root
++   - 目標是只掃描 Wiki 的 Layer 2（`entities/`, `concepts/`, `comparisons/`, `queries/`），避開 `raw/` 和既有 `graphify-out/`
+ 
+ 2. **分析圖譜結果**
+    - 重點看：graphify 發現了哪些 Wiki 頁面之間的 `semantically_similar_to` 邊
+@@ -132,6 +137,18 @@
+ 3. 只沉澱「新增的、有價值的」邊到 Wiki
+ 4. 記錄在 log.md
+ 
++### Flow D：對既有 Wiki 圖譜直接查詢
++
++適用場景：`~/wiki/graphify-out/graph.json` 已經存在，想直接問圖譜問題。
++
++```bash
++cd ~/wiki
++/graphify query "<question>"
++```
++
++- 不要從別的工作目錄對 `~/wiki/graphify-out/graph.json` 傳 `--graph` 絕對路徑；目前 package 會拒絕跳出當前 `graphify-out/` 樹的路徑
++- 如果 query 出現 skill/package 版本警告，先刷新 graphify 的平台安裝，再重跑
++
+ ---
+ 
+ ## 避免重複做工的規則
+@@ -177,6 +194,18 @@
+ - 此技能引用 `/graphify` 指令，但 graphify 是獨立技能，必須已安裝且可用才能執行串接流程。
+ - 如果 graphify 未安裝，流程 A/B/C 中的探勘步驟會失敗，需回退到純 LLM Wiki 單獨使用。
+ 
++### Graphify 單一路徑假設
++- `/graphify` 工作流以單一 corpus root 為前提；像 `~/wiki/concepts/ ~/wiki/entities/` 這種多路徑示例不可直接照抄
++- 若只想分析 Wiki 的 Layer 2，先把目標子目錄整理到一個暫時目錄，再對那個 root 跑 graphify
++
++### Graphify Query 工作目錄限制
++- `graphify query` 會把 graph 路徑限制在當前工作目錄下的 `graphify-out/`
++- 查 `~/wiki/graphify-out/graph.json` 時，先 `cd ~/wiki` 再跑 query
++
++### Graphify / Skill 版本漂移
++- 如果 CLI 出現 `skill is from graphify X, package is Y`，代表技能文字和 package 已漂移
++- 優先更新平台技能安裝，再依新版 package 行為驗證 `query` / `report` / `export` 流程
++
+ ---
+ 
+ ## 觸發條件
+@@ -221,4 +250,4 @@
+ 
+ # Step 2: 比對新發現
+ # Step 3: 增量沉澱
+-```
+\ No newline at end of file
++```

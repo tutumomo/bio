@@ -1,0 +1,17 @@
+--- a/skills/llm-wiki/SKILL.md
++++ b/skills/llm-wiki/SKILL.md
+@@ -420,6 +420,14 @@
+ A single source can trigger updates across 5-15 wiki pages. This is normal
+ and desired — it's the compounding effect.
+ 
++### Graphify-to-Wiki migration rule
++
++When a page is created or updated from graph extraction results:
++- `graphify_source: true` is optional metadata, not a substitute for llm-wiki frontmatter
++- Every migrated page must still carry `quality`, `source_type`, and `domain`
++- If graphify output is derived from existing wiki pages rather than raw sources, use conservative provenance and make it explicit in `sources`
++- Never create `[[wikilinks]]` from AMBIGUOUS edges without human confirmation; put those under a clearly labeled inference or follow-up section instead
++
+ ### 2. Query
+ 
+ When the user asks a question about the wiki's domain:

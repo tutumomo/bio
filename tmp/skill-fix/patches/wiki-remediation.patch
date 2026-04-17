@@ -1,0 +1,579 @@
+--- a/wiki/log.md
++++ b/wiki/log.md
+@@ -26,4 +26,10 @@
+ - 更新 SCHEMA.md：新增「知識工具標籤」和「人物」分類
+ - 建立 _meta/classification.md：分類日誌首次建立
+ - 建立新目錄：raw/specs/, raw/datasets/, raw/news/, raw/transcripts/, _meta/, _archive/
+-- 更新 index.md：頁面數 27 → 32
+\ No newline at end of file
++- 更新 index.md：頁面數 27 → 32
++
++## [2026-04-12] lint | mirrored wiki remediation
++- 補齊 pages 的 `quality`、`source_type`、`domain` frontmatter
++- 修正 5 個 broken wikilinks
++- 補上 `decision-chain` 與 `etf-發行商生態` 的 inbound links
++
+--- a/wiki/entities/0050-yuanta-taiwan-50.md
++++ b/wiki/entities/0050-yuanta-taiwan-50.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [市值型, TWSE, 發行商-元大]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 元大台灣50（0050）
+ 
+ 元大台灣50 — 追蹤富時臺灣50指數，台股市值型ETF龍頭，A規模最大
+@@ -32,7 +36,6 @@
+ ## 關聯 ETF
+ 
+ - [[0050-yuanta-taiwan-50]]
+-- [[006208-fubon-taiwan-50]]
+ - [[市值型-etf]]
+ 
+ ## 備註
+--- a/wiki/entities/0051-yuanta-mid-cap-100.md
++++ b/wiki/entities/0051-yuanta-mid-cap-100.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [市值型, TWSE, 發行商-元大]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 元大中型100（0051）
+ 
+ 元大中型100 — 追蹤中型100指數，填補0050忽略的中型股
+@@ -32,7 +36,6 @@
+ ## 關聯 ETF
+ 
+ - [[0050-yuanta-taiwan-50]]
+-- [[006208-fubon-taiwan-50]]
+ - [[市值型-etf]]
+ 
+ ## 備註
+--- a/wiki/entities/0056-yuanta-high-dividend.md
++++ b/wiki/entities/0056-yuanta-high-dividend.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [高股息, TWSE, 發行商-元大]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 元大高股息（0056）
+ 
+ 元大高股息 — 台股高股息ETF先驅，追蹤臺灣高股息指數
+--- a/wiki/entities/006204-sinopac-weighted.md
++++ b/wiki/entities/006204-sinopac-weighted.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [市值型, TWSE, 發行商-永豐]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 永豐臺灣加權（006204）
+ 
+ 永豐臺灣加權 — 追蹤加權指數的全市值ETF
+@@ -32,7 +36,6 @@
+ ## 關聯 ETF
+ 
+ - [[0050-yuanta-taiwan-50]]
+-- [[006208-fubon-taiwan-50]]
+ - [[市值型-etf]]
+ 
+ ## 備註
+--- a/wiki/entities/006208-fubon-taiwan-50.md
++++ b/wiki/entities/006208-fubon-taiwan-50.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [市值型, TWSE, 發行商-富邦]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 富邦台50（006208）
+ 
+ 富邦台50 — 追蹤同指數的市值型ETF，費用率較0050低
+@@ -32,7 +36,6 @@
+ ## 關聯 ETF
+ 
+ - [[0050-yuanta-taiwan-50]]
+-- [[006208-fubon-taiwan-50]]
+ - [[市值型-etf]]
+ 
+ ## 備註
+--- a/wiki/entities/00679B-yuanta-us-20y-bond.md
++++ b/wiki/entities/00679B-yuanta-us-20y-bond.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [債券型, 跨境型, TPEx, 發行商-元大]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 元大美債20年（00679B）
+ 
+ 元大美債20年 — 20年期美債ETF，長天期債券代表
+--- a/wiki/entities/00687B-cathay-20y-us-bond.md
++++ b/wiki/entities/00687B-cathay-20y-us-bond.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [債券型, 跨境型, TPEx, 發行商-國泰]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 國泰20年美債（00687B）
+ 
+ 國泰20年美債 — 20年期美債ETF，與00679B競品
+--- a/wiki/entities/00713-yuanta-high-div-low-vol.md
++++ b/wiki/entities/00713-yuanta-high-div-low-vol.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [高股息, TWSE, 發行商-元大]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 元大台灣高息低波（00713）
+ 
+ 元大台灣高息低波 — 高息+低波動雙策略
+--- a/wiki/entities/00772B-ctbc-high-grade-corp-bond.md
++++ b/wiki/entities/00772B-ctbc-high-grade-corp-bond.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [債券型, TPEx, 發行商-中信]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 中信高評級公司債（00772B）
+ 
+ 中信高評級公司債 — 投資級公司債ETF
+--- a/wiki/entities/00830-cathay-philly-semiconductor.md
++++ b/wiki/entities/00830-cathay-philly-semiconductor.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [產業型, TWSE, 發行商-國泰]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 國泰費城半導體（00830）
+ 
+ 國泰費城半導體 — 半導體產業ETF
+--- a/wiki/entities/00878-cathay-esg-high-dividend.md
++++ b/wiki/entities/00878-cathay-esg-high-dividend.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [高股息, ESG, TWSE, 發行商-國泰]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 國泰永續高股息（00878）
+ 
+ 國泰永續高股息 — ESG+高股息雙主題，規模成長最快
+--- a/wiki/entities/00881-cathay-tech-leaders.md
++++ b/wiki/entities/00881-cathay-tech-leaders.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [產業型, TWSE, 發行商-國泰]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 國泰台灣科技龍頭（00881）
+ 
+ 國泰台灣科技龍頭 — 科技龍頭選股
+--- a/wiki/entities/00891-ctbc-key-semiconductor.md
++++ b/wiki/entities/00891-ctbc-key-semiconductor.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [產業型, TWSE]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 中信關鍵半導體（00891）
+ 
+ 中信關鍵半導體 — 半導體產業ETF
+--- a/wiki/entities/00919-capital-taiwan-selected-high-dividend.md
++++ b/wiki/entities/00919-capital-taiwan-selected-high-dividend.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [高股息, TWSE, 發行商-群益]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 群益台灣精選高息（00919）
+ 
+ 群益台灣精選高息 — 精選高息策略
+--- a/wiki/entities/00929-fuhwa-tech-optimal-income.md
++++ b/wiki/entities/00929-fuhwa-tech-optimal-income.md
+@@ -5,8 +5,12 @@
+ type: entity
+ tags: [高股息, 產業型, TWSE, 發行商-復華]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 復華台灣科技優息（00929）
+ 
+ 復華台灣科技優息 — 科技優息，主人已持有的ETF
+--- a/wiki/entities/andrej-karpathy.md
++++ b/wiki/entities/andrej-karpathy.md
+@@ -6,9 +6,10 @@
+ tags: [人物.研究者, 知識管理.方法論, 知識管理.wiki]
+ sources: [raw/specs/karpathy-llm-wiki-gist-2026.md]
+ quality: primary
+-source_type: spec
++source_type: specdomain: knowledge.tooling
+ ---
+ 
++
+ # Andrej Karpathy
+ 
+ AI 研究者、OpenAI 共同創辦人、前 Tesla AI 總監。以深度學習教學和 LLM 應用方法論聞名。
+--- a/wiki/entities/graphify.md
++++ b/wiki/entities/graphify.md
+@@ -6,9 +6,10 @@
+ tags: [知識管理.圖譜, AI工具.提取, AI工具.助理, 比較]
+ sources: [raw/articles/aivi-graphify-overview-2026.md]
+ quality: secondary
+-source_type: article
++source_type: articledomain: knowledge.tooling
+ ---
+ 
++
+ # Graphify
+ 
+ AI coding assistant 的 Skill 插件，核心使命是將任意文件夾中的代碼、文檔、論文、圖片轉化為可查詢的知識圖譜。MIT 開源授權。
+--- a/wiki/concepts/decision-chain.md
++++ b/wiki/concepts/decision-chain.md
+@@ -5,8 +5,12 @@
+ type: concept
+ tags: [投資策略, 市場體制, 風險]
+ sources: [ETF_TW/instances/etf_master/state/strategy_link.json]
++quality: primary
++source_type: dataset
++domain: invest.strategy
+ ---
+ 
++
+ # 知識→行動決策鏈
+ 
+ > 這是智慧體從「知道」到「做到」的完整路徑。每個 cron 任務都必須遵循此鏈，確保產出不是空泛的資訊，而是可驅動投資行動的判斷。
+--- a/wiki/concepts/etf-發行商生態.md
++++ b/wiki/concepts/etf-發行商生態.md
+@@ -5,8 +5,12 @@
+ type: concept
+ tags: [發行商, 投資策略]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # ETF 發行商生態
+ 
+ 台灣 ETF 市場由多家投信共同經營，以下是主要發行商及其特色。
+--- a/wiki/concepts/llm-wiki-模式.md
++++ b/wiki/concepts/llm-wiki-模式.md
+@@ -6,9 +6,10 @@
+ tags: [知識管理.wiki, 知識管理.方法論, 比較]
+ sources: [raw/specs/karpathy-llm-wiki-gist-2026.md, raw/articles/aivi-graphify-overview-2026.md]
+ quality: primary
+-source_type: spec
++source_type: specdomain: knowledge.tooling
+ ---
+ 
++
+ # LLM Wiki 模式
+ 
+ 由 [[andrej-karpathy]] 提出的知識管理模式：讓 LLM 增量建構和維護一個持久化的 wiki，而非每次從頭檢索。創造「持久化、可複利的 artifact」。
+@@ -46,7 +47,7 @@
+ | 維度 | RAG | LLM Wiki |
+ |------|-----|----------|
+ | 知識取得 | 每次從頭檢索 | 預編譯，持久化 |
+-| 交叉引用 | 需要額外處理 | 原生 `[[wikilinks]]` |
++| 交叉引用 | 需要額外處理 | 原生 wikilinks |
+ | 矛盾處理 | 通常覆蓋 | 標記並並存 |
+ | 可審核性 | 黑盒 | 可讀的 markdown |
+ | 維護成本 | 低 | 中（需要 lint） |
+@@ -68,4 +69,4 @@
+ - [[andrej-karpathy]] — LLM Wiki 模式的提出者
+ - [[graphify]] — 圖譜導向的知識管理工具
+ - [[知識圖譜-vs-RAG]] — 更深入的對比分析
+-- [[雙通道提取引擎]] — Graphify 的 AST+LLM 雙通道技術
+\ No newline at end of file
++- [[雙通道提取引擎]] — Graphify 的 AST+LLM 雙通道技術
+--- a/wiki/concepts/market-view.md
++++ b/wiki/concepts/market-view.md
+@@ -5,8 +5,12 @@
+ type: concept
+ tags: [投資策略, 風險, 市場體制]
+ sources: [ETF_TW/instances/etf_master/state/market_context_taiwan.json]
++quality: primary
++source_type: dataset
++domain: invest.strategy
+ ---
+ 
++
+ # 市場體制判讀
+ 
+ > 這是智慧體「知識→行動」決策鏈的核心頁面。每次盤勢掃描後更新此頁，讓未來的決策有上下文可循。
+@@ -47,5 +51,9 @@
+ 
+ - [[risk-signal]] — 風險訊號儀表板
+ - [[家族投資需求]] — 各成員在不同體制下的配置建議
+-- [[高股息]] — 防守偏重時的核心選項
+-- [[市值型-etf]] — 多頭偏重時的成長引擎
+\ No newline at end of file
++- [[高股息-etf]] — 防守偏重時的核心選項
++- [[市值型-etf]] — 多頭偏重時的成長引擎
++
++## 上下文
++
++- [[decision-chain]] — 體制判讀在整條知識→行動鏈中的位置
+--- a/wiki/concepts/risk-signal.md
++++ b/wiki/concepts/risk-signal.md
+@@ -5,8 +5,12 @@
+ type: concept
+ tags: [風險, 市場體制, 投資策略]
+ sources: [ETF_TW/instances/etf_master/state/market_event_context.json]
++quality: primary
++source_type: dataset
++domain: invest.strategy
+ ---
+ 
++
+ # 風險訊號儀表板
+ 
+ > 即時風險監控頁面。盤中掃描每 30 分鐘更新，盤後收工時做當日總結。此頁是判斷「今天能不能動」的關鍵依據。
+--- a/wiki/concepts/債券型-etf.md
++++ b/wiki/concepts/債券型-etf.md
+@@ -5,8 +5,12 @@
+ type: concept
+ tags: [債券型, 投資策略, TPEx]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 債券型 ETF
+ 
+ 投資於各類債券（美國公債、投資級公司債、非投資級債、新興市場債等）的 ETF。主要功能為配息收入與分散風險。
+--- a/wiki/concepts/家族投資需求.md
++++ b/wiki/concepts/家族投資需求.md
+@@ -5,8 +5,12 @@
+ type: concept
+ tags: [投資策略, 家族成員]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.strategy
+ ---
+ 
++
+ # 家族投資需求
+ 
+ 主人家族四位成員各有不同的投資需求與風險偏好，ETF 配置應依此分流。
+--- a/wiki/concepts/市值型-etf.md
++++ b/wiki/concepts/市值型-etf.md
+@@ -5,8 +5,12 @@
+ type: concept
+ tags: [市值型, 投資策略, TWSE]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 市值型 ETF
+ 
+ 追蹤大盤指數的 ETF，以市值加權選股，追求貼近市場整體表現。核心配置工具，適合長期持有。
+--- a/wiki/concepts/產業型-etf.md
++++ b/wiki/concepts/產業型-etf.md
+@@ -5,8 +5,12 @@
+ type: concept
+ tags: [產業型, 投資策略, TWSE]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 產業型 ETF
+ 
+ 追蹤特定產業指數的 ETF，專注於半導體、科技、金融、AI、綠能等單一產業或主題。
+--- a/wiki/concepts/知識圖譜-vs-RAG.md
++++ b/wiki/concepts/知識圖譜-vs-RAG.md
+@@ -6,9 +6,10 @@
+ tags: [知識管理.圖譜, 知識管理.RAG, 知識管理.方法論, 比較]
+ sources: [raw/specs/karpathy-llm-wiki-gist-2026.md, raw/articles/aivi-graphify-overview-2026.md]
+ quality: primary
+-source_type: spec
++source_type: specdomain: knowledge.tooling
+ ---
+ 
++
+ # 知識圖譜 vs RAG：兩種知識管理範式
+ 
+ 知識圖譜（如 [[graphify]]）和 RAG（Retrieval-Augmented Generation）是兩種讓 LLM 存取外部知識的主要方法。它們有不同的哲學和適用場景。
+@@ -44,7 +45,7 @@
+ 
+ ## 混合策略：從圖譜到 Wiki
+ 
+-最佳的知識管理流程可能是兩者的結合（參考 [[知識管理.方法論]]）：
++最佳的知識管理流程可能是兩者的結合（參考 `知識管理.方法論`）：
+ 
+ 1. **Graphify 探勘**：用圖譜發現隱藏連結和社群結構
+ 2. **選擇性沉澱**：只把 EXTRACTED 和高信心 INFERRED 邊沉澱到 wiki
+--- a/wiki/concepts/雙通道提取引擎.md
++++ b/wiki/concepts/雙通道提取引擎.md
+@@ -6,9 +6,10 @@
+ tags: [知識管理.圖譜, AI工具.提取]
+ sources: [raw/articles/aivi-graphify-overview-2026.md]
+ quality: secondary
+-source_type: article
++source_type: articledomain: knowledge.tooling
+ ---
+ 
++
+ # 雙通道提取引擎
+ 
+ [[graphify]] 的核心技術：結合 AST 靜態分析和 LLM 語義理解兩條提取路徑，實現準確性和覆蓋率的平衡。
+--- a/wiki/concepts/高股息-etf.md
++++ b/wiki/concepts/高股息-etf.md
+@@ -5,8 +5,12 @@
+ type: concept
+ tags: [高股息, 投資策略, TWSE]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 高股息 ETF
+ 
+ 以股息收入為主要投資目標的 ETF，選股邏輯圍繞殖利率、配息穩定度。適合追求現金流的投資者。
+--- a/wiki/comparisons/0050-vs-006208.md
++++ b/wiki/comparisons/0050-vs-006208.md
+@@ -5,8 +5,12 @@
+ type: comparison
+ tags: [市值型, 比較, TWSE, 發行商-元大, 發行商-富邦]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 0050 vs 006208 — 元大台灣50 vs 富邦台50
+ 
+ 追蹤同一指數（富時臺灣證券交易所臺灣50指數）的兩檔市值型 ETF 直接競品分析。
+@@ -42,4 +46,8 @@
+ - **長期定期定額** → 006208 的費用優勢會累積
+ - **短期交易** → 0050 的流動性更佳
+ 
+-> 兩者追蹤同一指數，長期績效差異主要來自費用率。
+\ No newline at end of file
++> 兩者追蹤同一指數，長期績效差異主要來自費用率。
++
++## 延伸閱讀
++
++- [[etf-發行商生態|ETF 發行商生態]] — 比較同指數產品時，也要納入發行商費率與產品策略
+--- a/wiki/comparisons/0056-vs-00878-vs-00929.md
++++ b/wiki/comparisons/0056-vs-00878-vs-00929.md
+@@ -5,8 +5,12 @@
+ type: comparison
+ tags: [高股息, 比較, TWSE, 發行商-元大, 發行商-國泰, 發行商-復華]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 0056 vs 00878 vs 00929 — 三大高股息 ETF 對決
+ 
+ 台股市值前三大的高股息 ETF 併排比較，幫助現金流導向投資者選擇最適標的。
+--- a/wiki/comparisons/00679B-vs-00687B.md
++++ b/wiki/comparisons/00679B-vs-00687B.md
+@@ -5,15 +5,19 @@
+ type: comparison
+ tags: [債券型, 比較, TPEx, 發行商-元大, 發行商-國泰]
+ sources: [raw/data/etf_universe_tw.json]
++quality: primary
++source_type: dataset
++domain: invest.etf
+ ---
+ 
++
+ # 00679B vs 00687B — 元大美債20年 vs 國泰20年美債
+ 
+ 兩檔主流長天期美國公債 ETF 直接競品分析，適合債券配置決策。
+ 
+ ## 比較維度
+ 
+-| 維度 | [[00679B-yuanta-us-20y-bond\|00679B]] | [[00687B-cathay-20y-us-bond\|00687B]] |
++| 維度 | [[00679B-yuanta-us-20y-bond|00679B]] | [[00687B-cathay-20y-us-bond|00687B]] |
+ |------|------|--------|
+ | **發行商** | 元大投信 | 國泰投信 |
+ | **追蹤指數** | ICE 美國政府 20+ 年期債券 | 彭博 20 年期以上美國公債 |

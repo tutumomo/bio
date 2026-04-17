@@ -11,13 +11,7 @@ from backend.schemas.gene import GeneResponse, GeneSearchResult, TissueExpressio
 from backend.schemas.string_partner import StringPartner, StringPartnersResult
 from backend.services.gene_pipeline import GenePipeline
 from backend.services.string_db import StringDBClient
-from backend.auth.dependencies import get_optional_user
-from backend.models.user import SearchHistory, User
-
-router = APIRouter(prefix="/api/genes", tags=["genes"])
-pipeline = GenePipeline()
-string_db = StringDBClient()
-
+from backend.auth.dependencies import get_optional_user, check_query_limit, record_search_history
 
 @router.get("/search", response_model=GeneSearchResult)
 @limiter.limit("60/minute")
@@ -25,7 +19,7 @@ async def search_genes(
     request: Request,
     q: str = Query(..., min_length=1, description="Gene symbol or protein name"),
     db: AsyncSession = Depends(get_db),
-    current_user: Optional[User] = Depends(get_optional_user),
+    user: Optional[User] = Depends(check_query_limit),
 ):
     results = await pipeline.search_genes_cached(q, db)
     genes = [
@@ -47,50 +41,13 @@ async def search_genes(
         for g in results
     ]
 
-    if current_user and genes:
-        # Enforce per-user daily query limit
-        today = date.today()
-        if current_user.last_query_date != today:
-            current_user.daily_query_count = 0
-            current_user.last_query_date = today
-        
-        if current_user.daily_query_count >= 100:
-            raise HTTPException(
-                status_code=429, 
-                detail="Daily query limit reached (100/day)"
-            )
-        
-        current_user.daily_query_count += 1
-
-        # Check for duplicate query within 5 minutes
-        five_minutes_ago = datetime.now() - timedelta(minutes=5)
-        stmt = (
-            select(SearchHistory)
-            .where(
-                SearchHistory.user_id == current_user.id,
-                SearchHistory.query == q,
-                SearchHistory.searched_at >= five_minutes_ago
-            )
-            .order_by(desc(SearchHistory.searched_at))
-            .limit(1)
+    if user:
+        await record_search_history(
+            db=db,
+            user=user,
+            query=q,
+            gene_count=len(genes)
         )
-        
-        result = await db.execute(stmt)
-        last_history = result.scalar_one_or_none()
-        
-        if last_history:
-            # Just update the timestamp
-            last_history.searched_at = func.now()
-        else:
-            # Create new entry
-            history_entry = SearchHistory(
-                user_id=current_user.id,
-                query=q,
-                gene_count=len(genes),
-            )
-            db.add(history_entry)
-            
-        await db.commit()
 
     return GeneSearchResult(genes=genes, query=q, total=len(genes))
 

@@ -1,0 +1,23 @@
+--- a/skills/graphify/SKILL.md
++++ b/skills/graphify/SKILL.md
+@@ -35,6 +35,11 @@
+ /graphify explain "SwinTransformer"                   # plain-language explanation of a node
+ ```
+ 
++## Compatibility Notes
++
++- The installed `graphify` package may be newer than the checked-in skill text. If the CLI warns about a skill/package version mismatch, refresh the platform install before trusting generated snippets.
++- `graphify query` is rooted to the current working directory's `graphify-out/graph.json`. If the target graph lives in `~/wiki/graphify-out/graph.json`, run the query from `~/wiki/` rather than passing an external `--graph` path.
++
+ ## What graphify is for
+ 
+ graphify is built around Andrej Karpathy's /raw folder workflow: drop anything into a folder - papers, tweets, screenshots, code, notes - and get a structured knowledge graph that shows you what you didn't know was connected.
+@@ -827,6 +832,8 @@
+ 
+ ## For /graphify query
+ 
++Run queries from the corpus root that contains `graphify-out/graph.json`. The package rejects `--graph` paths that escape the current working directory's `graphify-out/` tree.
++
+ Two traversal modes - choose based on the question:
+ 
+ | Mode | Flag | Best for |
