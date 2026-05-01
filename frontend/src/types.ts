@@ -135,3 +135,22 @@ export interface TissueExpressionResult {
   ensembl_id: string;
   expression: TissueExpressionEntry[];
 }
+
+// ── OMIM Disease Associations ──────────────────────────────────
+export interface OmimDisease {
+  mim_number: string;
+  title: string;
+  phenotype_type: string | null;
+  chromosome: string | null;
+  gene_symbols: string[];
+  description: string;
+  inheritance: string | null;
+  last_updated: string | null;
+}
+
+export interface OmimDiseaseResult {
+  gene_symbol: string;
+  diseases: OmimDisease[];
+  total: number;
+  omim_search_url: string;
+}

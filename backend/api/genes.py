@@ -11,12 +11,15 @@ from backend.schemas.gene import GeneResponse, GeneSearchResult, TissueExpressio
 from backend.schemas.string_partner import StringPartner, StringPartnersResult
 from backend.services.gene_pipeline import GenePipeline
 from backend.services.string_db import StringDBClient
+from backend.services.omim import OmimClient
 from backend.auth.dependencies import get_optional_user, check_query_limit, record_search_history
 from backend.models.user import User
+from backend.schemas.omim import OmimDisease, OmimDiseaseResult
 
 router = APIRouter(prefix="/api/genes", tags=["genes"])
 pipeline = GenePipeline()
 string_db = StringDBClient()
+omim_client = OmimClient()
 
 @router.get("/search", response_model=GeneSearchResult)
 @limiter.limit("60/minute")
@@ -100,4 +103,20 @@ async def get_tissue_expression(
         gene_symbol=gene_symbol,
         ensembl_id=ensembl_id,
         expression=[TissueExpressionEntry(**e) for e in expression_raw],
+    )
+
+
+@router.get("/{gene_symbol}/omim", response_model=OmimDiseaseResult)
+async def get_omim_diseases(
+    gene_symbol: str,
+    limit: int = Query(20, ge=1, le=50),
+):
+    """Fetch OMIM disease associations for a gene."""
+    diseases_raw = await omim_client.get_diseases_for_gene(gene_symbol, limit=limit)
+    diseases = [OmimDisease(**d) for d in diseases_raw]
+    return OmimDiseaseResult(
+        gene_symbol=gene_symbol,
+        diseases=diseases,
+        total=len(diseases),
+        omim_search_url=f"https://omim.org/search?search={gene_symbol}",
     )

@@ -8,6 +8,7 @@ import type {
   PathwayProteinsResult,
   StringPartnersResult,
   TissueExpressionResult,
+  OmimDiseaseResult,
 } from "@/types";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
@@ -79,4 +80,9 @@ export const api = {
       `/api/genes/${encodeURIComponent(geneSymbol)}/expression${search}`
     );
   },
+
+  getOmimDiseases: (geneSymbol: string, limit = 20) =>
+    fetchAPI<OmimDiseaseResult>(
+      `/api/genes/${encodeURIComponent(geneSymbol)}/omim?limit=${limit}`
+    ),
 };

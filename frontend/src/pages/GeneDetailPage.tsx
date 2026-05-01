@@ -10,6 +10,7 @@ import SkeletonTable from "@/components/SkeletonTable";
 import { ErrorState } from "@/components/ErrorState";
 import { SourceLinkButtons } from "@/components/SourceLinkButtons";
 import { StringPartnersPanel } from "@/components/StringPartnersPanel";
+import { OmimDiseasePanel } from "@/components/OmimDiseasePanel";
 import TissueExpressionChart from "@/components/TissueExpressionChart";
 import { useVariants } from "@/hooks/useVariants";
 import type { VariantFilters, Gene } from "@/types";
@@ -120,6 +121,13 @@ export function GeneDetailPage() {
           <TissueExpressionChart geneSymbol={geneSymbol} ensemblId={ensemblId || undefined} />
         )}
       </div>
+
+      {/* OMIM Disease Associations */}
+      {geneSymbol && (
+        <div className="w-full">
+          <OmimDiseasePanel geneSymbol={geneSymbol} />
+        </div>
+      )}
 
       {/* Variant Table Section */}
       <div className="space-y-6">
