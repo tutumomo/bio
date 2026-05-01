@@ -152,4 +152,4 @@ Open `http://localhost:5555`
 | Backend / 後端 | FastAPI, SQLAlchemy 2.0, asyncpg, httpx |
 | Database / 資料庫 | PostgreSQL 16 |
 | Auth / 驗證 | OAuth 2.0 (Google, GitHub) + JWT |
-| External APIs / 外部 API | NCBI E-utilities, Ensembl VEP, RegulomeDB |
+| External APIs / 外部 API | NCBI E-utilities, Ensembl VEP, RegulomeDB, ClinVar, gnomAD |
