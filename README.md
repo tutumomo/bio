@@ -51,7 +51,7 @@ bio/
 
 ### Prerequisites / 需求
 
-- Python 3.9+
+- Python 3.11
 - Node.js 18+
 - PostgreSQL 16（透過 Homebrew 或 Docker / via Homebrew or Docker）
 
@@ -69,6 +69,8 @@ docker-compose up -d db
 
 ```bash
 cd backend
+python3.11 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 export DATABASE_URL="postgresql+asyncpg://$(whoami)@localhost:5432/helix_bio"
 export JWT_SECRET="dev-secret-key"
