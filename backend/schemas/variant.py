@@ -13,6 +13,8 @@ class VariantResponse(BaseModel):
     regulome_rank: Optional[str] = None
     protein_position: Optional[str] = None
     amino_acid_change: Optional[str] = None
+    hgvsc: Optional[str] = None
+    hgvsp: Optional[str] = None
     dbsnp_url: Optional[str] = None
     ensembl_vep_url: Optional[str] = None
 

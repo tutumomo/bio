@@ -59,6 +59,8 @@ async def get_gene_variants(
             regulome_rank=v.get("regulome_rank"),
             protein_position=v.get("protein_position"),
             amino_acid_change=v.get("amino_acid_change"),
+            hgvsc=v.get("hgvsc"),
+            hgvsp=v.get("hgvsp"),
             dbsnp_url="https://www.ncbi.nlm.nih.gov/snp/{}".format(v["rsid"]),
             ensembl_vep_url="https://ensembl.org/Homo_sapiens/Variation/Explore?v={}".format(v["rsid"]),
         )
@@ -97,6 +99,8 @@ async def get_variant_annotation(rsid: str):
         regulome_rank=regulome_results.get(rsid),
         protein_position=vep_data.get("protein_position"),
         amino_acid_change=vep_data.get("amino_acid_change"),
+        hgvsc=vep_data.get("hgvsc"),
+        hgvsp=vep_data.get("hgvsp"),
         dbsnp_url="https://www.ncbi.nlm.nih.gov/snp/{}".format(rsid),
         ensembl_vep_url="https://ensembl.org/Homo_sapiens/Variation/Explore?v={}".format(rsid),
     )

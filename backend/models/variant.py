@@ -19,6 +19,8 @@ class VariantCache(Base):
     regulome_rank: Mapped[Optional[str]] = mapped_column(String)
     protein_position: Mapped[Optional[str]] = mapped_column(String)
     amino_acid_change: Mapped[Optional[str]] = mapped_column(String)
+    hgvsc: Mapped[Optional[str]] = mapped_column(String)
+    hgvsp: Mapped[Optional[str]] = mapped_column(String)
     fetched_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     gene: Mapped[Optional["GeneCache"]] = relationship(back_populates="variants")

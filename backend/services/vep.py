@@ -27,7 +27,7 @@ class VEPClient:
         url = f"{ENSEMBL_REST}/vep/human/id"
         payload = {"ids": rsids}
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
-        params = {"CADD": 1, "Conservation": 1}
+        params = {"CADD": 1, "Conservation": 1, "hgvs": 1}
 
         async with self._semaphore:
             async with httpx.AsyncClient(timeout=120) as client:
@@ -45,6 +45,8 @@ class VEPClient:
             gerp_score: Optional[float] = None
             protein_position: Optional[str] = None
             amino_acid_change: Optional[str] = None
+            hgvsc: Optional[str] = None
+            hgvsp: Optional[str] = None
 
             if transcript_cons:
                 canonical = next(
@@ -52,6 +54,8 @@ class VEPClient:
                     transcript_cons[0],
                 )
                 impact = canonical.get("impact", "")
+                hgvsc = canonical.get("hgvsc")
+                hgvsp = canonical.get("hgvsp")
                 protein_position = (
                     str(canonical.get("protein_start", ""))
                     if canonical.get("protein_start")
@@ -75,6 +79,8 @@ class VEPClient:
                     "gerp_score": gerp_score,
                     "protein_position": protein_position,
                     "amino_acid_change": amino_acid_change,
+                    "hgvsc": hgvsc,
+                    "hgvsp": hgvsp,
                 }
             )
         return results

@@ -161,6 +161,8 @@ class GenePipeline:
                 "regulome_rank": regulome_results.get(rsid),
                 "protein_position": vep.get("protein_position"),
                 "amino_acid_change": vep.get("amino_acid_change"),
+                "hgvsc": vep.get("hgvsc"),
+                "hgvsp": vep.get("hgvsp"),
             })
         return merged
 
@@ -203,6 +205,8 @@ class GenePipeline:
                     regulome_rank=v.get("regulome_rank"),
                     protein_position=v.get("protein_position"),
                     amino_acid_change=v.get("amino_acid_change"),
+                    hgvsc=v.get("hgvsc"),
+                    hgvsp=v.get("hgvsp"),
                     fetched_at=datetime.now(timezone.utc).replace(tzinfo=None),
                 )
                 await db.merge(variant_obj)
@@ -261,6 +265,8 @@ class GenePipeline:
                 "regulome_rank": r.regulome_rank,
                 "protein_position": r.protein_position,
                 "amino_acid_change": r.amino_acid_change,
+                "hgvsc": r.hgvsc,
+                "hgvsp": r.hgvsp,
             }
             for r in rows
         ]

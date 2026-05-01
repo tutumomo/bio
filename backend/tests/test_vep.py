@@ -31,6 +31,19 @@ async def test_annotate_includes_cadd():
 
 
 @pytest.mark.asyncio
+async def test_annotate_includes_hgvs():
+    client = VEPClient()
+    results = await client.annotate_variants(["rs80357906"])
+    ann = results[0]
+    assert "hgvsc" in ann
+    assert "hgvsp" in ann
+    if ann["hgvsc"]:
+        assert ":c." in ann["hgvsc"]
+    if ann["hgvsp"]:
+        assert ":p." in ann["hgvsp"]
+
+
+@pytest.mark.asyncio
 async def test_annotate_empty_list():
     client = VEPClient()
     results = await client.annotate_variants([])
