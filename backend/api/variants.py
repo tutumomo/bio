@@ -61,6 +61,12 @@ async def get_gene_variants(
             amino_acid_change=v.get("amino_acid_change"),
             hgvsc=v.get("hgvsc"),
             hgvsp=v.get("hgvsp"),
+            clinvar_significance=v.get("clinvar_significance"),
+            clinvar_review_stars=v.get("clinvar_review_stars"),
+            gnomad_af_popmax=v.get("gnomad_af_popmax"),
+            acmg_tier=v.get("acmg_tier"),
+            acmg_evidence_codes=v.get("acmg_evidence_codes"),
+            acmg_rationale=v.get("acmg_rationale"),
             dbsnp_url="https://www.ncbi.nlm.nih.gov/snp/{}".format(v["rsid"]),
             ensembl_vep_url="https://ensembl.org/Homo_sapiens/Variation/Explore?v={}".format(v["rsid"]),
         )

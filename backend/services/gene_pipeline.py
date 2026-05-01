@@ -7,6 +7,9 @@ from backend.services.ensembl import EnsemblClient
 from backend.services.ncbi import NCBIClient
 from backend.services.regulomedb import RegulomeDBClient
 from backend.services.vep import VEPClient
+from backend.services.clinvar import ClinVarClient
+from backend.services.gnomad import GnomadClient
+from backend.services.acmg_classifier import classify as acmg_classify
 from backend.models.gene import GeneCache
 from backend.models.variant import VariantCache
 
@@ -23,6 +26,8 @@ class GenePipeline:
         self.ensembl = EnsemblClient()
         self.vep = VEPClient()
         self.regulomedb = RegulomeDBClient()
+        self.clinvar = ClinVarClient()
+        self.gnomad = GnomadClient()
 
     async def search_genes(self, query: str) -> List[Dict]:
         terms = [t.strip() for t in query.split(",") if t.strip()]
@@ -166,6 +171,51 @@ class GenePipeline:
             })
         return merged
 
+    async def _enrich_clinical(self, variants: List[Dict]) -> List[Dict]:
+        if not variants:
+            return variants
+
+        rsids = [
+            v["rsid"] for v in variants
+            if v.get("rsid", "").startswith("rs") and len(v["rsid"]) > 4
+        ]
+        clinvar_map, gnomad_map = await asyncio.gather(
+            self.clinvar.get_classifications_batch(rsids),
+            self.gnomad.get_variants_batch(rsids),
+        )
+
+        for variant in variants:
+            rsid = variant["rsid"]
+            clinvar = clinvar_map.get(rsid)
+            gnomad = gnomad_map.get(rsid)
+
+            variant["clinvar_significance"] = (
+                clinvar.get("classification") if clinvar else None
+            )
+            variant["clinvar_review_stars"] = (
+                clinvar.get("review_stars") if clinvar else None
+            )
+            variant["gnomad_af_popmax"] = (
+                gnomad.get("af_popmax") if gnomad else None
+            )
+
+            acmg = acmg_classify({
+                "consequence": variant.get("consequence"),
+                "impact": variant.get("impact"),
+                "cadd_score": variant.get("cadd_score"),
+                "gerp_score": variant.get("gerp_score"),
+                "gnomad_af_popmax": variant.get("gnomad_af_popmax"),
+                "clinvar_classification": variant.get("clinvar_significance"),
+                "clinvar_review_stars": variant.get("clinvar_review_stars") or 0,
+            })
+            variant["acmg_tier"] = acmg["tier"]
+            variant["acmg_evidence_codes"] = [
+                code.value for code in acmg["evidence_codes"]
+            ]
+            variant["acmg_rationale"] = acmg["rationale"]
+
+        return variants
+
     async def get_variants_cached(
         self,
         gene_symbol: str,
@@ -207,6 +257,10 @@ class GenePipeline:
                     amino_acid_change=v.get("amino_acid_change"),
                     hgvsc=v.get("hgvsc"),
                     hgvsp=v.get("hgvsp"),
+                    clinvar_significance=v.get("clinvar_significance"),
+                    clinvar_review_stars=v.get("clinvar_review_stars"),
+                    gnomad_af_popmax=v.get("gnomad_af_popmax"),
+                    acmg_tier=v.get("acmg_tier"),
                     fetched_at=datetime.now(timezone.utc).replace(tzinfo=None),
                 )
                 await db.merge(variant_obj)
@@ -267,9 +321,25 @@ class GenePipeline:
                 "amino_acid_change": r.amino_acid_change,
                 "hgvsc": r.hgvsc,
                 "hgvsp": r.hgvsp,
+                "clinvar_significance": r.clinvar_significance,
+                "clinvar_review_stars": r.clinvar_review_stars,
+                "gnomad_af_popmax": r.gnomad_af_popmax,
+                "acmg_tier": r.acmg_tier,
             }
             for r in rows
         ]
+
+        variants = await self._enrich_clinical(variants)
+        rows_by_rsid = {row.rsid: row for row in rows}
+        for variant in variants:
+            row = rows_by_rsid.get(variant["rsid"])
+            if row is None:
+                continue
+            row.clinvar_significance = variant.get("clinvar_significance")
+            row.clinvar_review_stars = variant.get("clinvar_review_stars")
+            row.gnomad_af_popmax = variant.get("gnomad_af_popmax")
+            row.acmg_tier = variant.get("acmg_tier")
+        await db.commit()
 
         return {"variants": variants, "total": total}
 

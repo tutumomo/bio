@@ -68,7 +68,23 @@ def _summarize_variant(raw: Dict) -> Dict:
 
 class GnomadClient:
     def __init__(self):
-        self._semaphore = asyncio.Semaphore(5)
+        self._request_lock = asyncio.Lock()
+        self._last_request_at = 0.0
+        self._min_request_interval = 0.35
+
+    async def _post_json(self, payload: Dict) -> Dict:
+        async with self._request_lock:
+            loop = asyncio.get_running_loop()
+            elapsed = loop.time() - self._last_request_at
+            if elapsed < self._min_request_interval:
+                await asyncio.sleep(self._min_request_interval - elapsed)
+
+            async with httpx.AsyncClient(timeout=30) as client:
+                resp = await client.post(GNOMAD_API, json=payload)
+            self._last_request_at = loop.time()
+
+        resp.raise_for_status()
+        return resp.json()
 
     @retry_http(attempts=3)
     async def get_variant_frequencies(self, rsid: str) -> Optional[Dict]:
@@ -76,11 +92,7 @@ class GnomadClient:
             return None
 
         payload = {"query": _VARIANT_QUERY, "variables": {"rsid": rsid}}
-        async with self._semaphore:
-            async with httpx.AsyncClient(timeout=30) as client:
-                resp = await client.post(GNOMAD_API, json=payload)
-                resp.raise_for_status()
-                data = resp.json()
+        data = await self._post_json(payload)
 
         if data.get("errors"):
             return None
@@ -93,9 +105,10 @@ class GnomadClient:
         if not rsids:
             return {}
 
-        tasks = [self.get_variant_frequencies(rsid) for rsid in rsids]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-        return {
-            rsid: (result if not isinstance(result, Exception) else None)
-            for rsid, result in zip(rsids, results)
-        }
+        results: Dict[str, Optional[Dict]] = {}
+        for rsid in rsids:
+            try:
+                results[rsid] = await self.get_variant_frequencies(rsid)
+            except Exception:
+                results[rsid] = None
+        return results

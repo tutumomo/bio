@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Float, ForeignKey, Index, String, DateTime, func
+from sqlalchemy import Float, ForeignKey, Index, Integer, String, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.core.database import Base
@@ -21,6 +21,10 @@ class VariantCache(Base):
     amino_acid_change: Mapped[Optional[str]] = mapped_column(String)
     hgvsc: Mapped[Optional[str]] = mapped_column(String)
     hgvsp: Mapped[Optional[str]] = mapped_column(String)
+    clinvar_significance: Mapped[Optional[str]] = mapped_column(String)
+    clinvar_review_stars: Mapped[Optional[int]] = mapped_column(Integer)
+    gnomad_af_popmax: Mapped[Optional[float]] = mapped_column(Float)
+    acmg_tier: Mapped[Optional[str]] = mapped_column(String)
     fetched_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     gene: Mapped[Optional["GeneCache"]] = relationship(back_populates="variants")

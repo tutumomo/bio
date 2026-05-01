@@ -5,7 +5,7 @@ import httpx
 from backend.core.resilience import retry_http
 
 ENSEMBL_REST = "https://rest.ensembl.org"
-VEP_BATCH_SIZE = 1000
+VEP_BATCH_SIZE = 200
 
 
 class VEPClient:

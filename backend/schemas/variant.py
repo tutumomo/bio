@@ -15,6 +15,12 @@ class VariantResponse(BaseModel):
     amino_acid_change: Optional[str] = None
     hgvsc: Optional[str] = None
     hgvsp: Optional[str] = None
+    clinvar_significance: Optional[str] = None
+    clinvar_review_stars: Optional[int] = None
+    gnomad_af_popmax: Optional[float] = None
+    acmg_tier: Optional[str] = None
+    acmg_evidence_codes: Optional[List[str]] = None
+    acmg_rationale: Optional[str] = None
     dbsnp_url: Optional[str] = None
     ensembl_vep_url: Optional[str] = None
 
