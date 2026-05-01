@@ -9,7 +9,25 @@ NCBI_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 class NCBIClient:
     def __init__(self):
         self._semaphore = asyncio.Semaphore(10 if settings.ncbi_api_key else 3)
+        self._request_lock = asyncio.Lock()
+        self._last_request_at = 0.0
         self._api_key_param = f"&api_key={settings.ncbi_api_key}" if settings.ncbi_api_key else ""
+        self._min_request_interval = 0.12 if settings.ncbi_api_key else 0.36
+
+    async def _get_json(self, url: str) -> dict:
+        async with self._semaphore:
+            async with self._request_lock:
+                loop = asyncio.get_running_loop()
+                elapsed = loop.time() - self._last_request_at
+                if elapsed < self._min_request_interval:
+                    await asyncio.sleep(self._min_request_interval - elapsed)
+
+                async with httpx.AsyncClient(timeout=30) as client:
+                    resp = await client.get(url)
+                self._last_request_at = loop.time()
+
+        resp.raise_for_status()
+        return resp.json()
 
     @retry_http(attempts=3)
     async def search_genes(self, query: str, max_results: int = 20) -> list:
@@ -19,11 +37,7 @@ class NCBIClient:
             f"&retmax={max_results}&retmode=json"
             f"{self._api_key_param}"
         )
-        async with self._semaphore:
-            async with httpx.AsyncClient(timeout=30) as client:
-                resp = await client.get(url)
-                resp.raise_for_status()
-                data = resp.json()
+        data = await self._get_json(url)
         return data.get("esearchresult", {}).get("idlist", [])
 
     @retry_http(attempts=3)
@@ -36,11 +50,7 @@ class NCBIClient:
             f"&id={ids_str}&retmode=json"
             f"{self._api_key_param}"
         )
-        async with self._semaphore:
-            async with httpx.AsyncClient(timeout=30) as client:
-                resp = await client.get(url)
-                resp.raise_for_status()
-                data = resp.json()
+        data = await self._get_json(url)
 
         results = []
         doc_sums = data.get("result", {})

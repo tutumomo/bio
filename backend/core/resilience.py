@@ -87,7 +87,7 @@ def retry_http(
                     logger.warning(f"Attempt {attempt} failed for {func.__name__}: {e}")
                 except httpx.HTTPStatusError as e:
                     last_exception = e
-                    if e.response.status_code in (503, 504):
+                    if e.response.status_code in (429, 503, 504):
                         logger.warning(f"Attempt {attempt} failed for {func.__name__} with status {e.response.status_code}")
                     else:
                         raise e # Don't retry other status codes
