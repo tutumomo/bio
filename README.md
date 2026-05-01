@@ -7,9 +7,9 @@
 > **本工具僅供研究與教育用途，不構成醫療建議或診斷依據。**
 > 所有變異分類結果應由臨床遺傳師覆核。請勿輸入可識別之病患個資（PHI）。
 
-一個面向生物資訊研究的 Web 平台，可搜尋人類基因／蛋白並產出論文等級的變異註解表格，整合 NCBI E-utilities、Ensembl VEP 與 RegulomeDB。
+一個面向生物資訊研究的 Web 平台，可搜尋人類基因／蛋白並產出論文等級的變異註解表格，整合 NCBI E-utilities、Ensembl VEP、RegulomeDB、ClinVar 與 gnomAD。
 
-A bioinformatics web platform that searches human genes and proteins and produces paper-quality variant annotation tables by integrating NCBI E-utilities, Ensembl VEP, and RegulomeDB.
+A bioinformatics web platform that searches human genes and proteins and produces paper-quality variant annotation tables by integrating NCBI E-utilities, Ensembl VEP, RegulomeDB, ClinVar, and gnomAD.
 
 ## Features / 功能特色
 
@@ -18,8 +18,16 @@ A bioinformatics web platform that searches human genes and proteins and produce
   - Search genes by symbol or protein name through NCBI E-utilities.
 
 - **SNP Annotation / SNP 註解**
-  - 提供來自 Ensembl VEP 與 RegulomeDB 的 CADD、GERP++ 與調控分數。
-  - Retrieve CADD, GERP++, and regulatory scores from Ensembl VEP and RegulomeDB.
+  - 提供來自 Ensembl VEP、RegulomeDB、ClinVar 與 gnomAD 的 CADD、GERP++、調控分數、臨床意義與族群頻率。
+  - Retrieve CADD, GERP++, regulatory scores, clinical significance, and population frequency from Ensembl VEP, RegulomeDB, ClinVar, and gnomAD.
+
+- **ACMG/AMP Evidence Summary / ACMG/AMP 證據摘要**
+  - 依自動化資料推導 PVS1、PS3、PM2、PP3、BA1、BS1、BS2、BP4、BP7 等證據碼與 preliminary 5-tier 分類。
+  - Derive preliminary ACMG/AMP 5-tier classifications and evidence codes from automated evidence.
+
+- **HGVS Nomenclature / HGVS 命名**
+  - 顯示 coding HGVS (`hgvsc`) 與 protein HGVS (`hgvsp`) 欄位。
+  - Display coding HGVS (`hgvsc`) and protein HGVS (`hgvsp`) fields.
 
 - **Paper-Quality Tables / 論文級表格輸出**
   - 產出 Gene overview（Table 2）與 variant annotations（Supplementary Table 1）格式資料。
