@@ -1,5 +1,12 @@
 # Helix Bio — Variant Annotation System
 
+> **FOR RESEARCH USE ONLY - Not a medical device.**
+> All variant classifications must be reviewed by a certified clinical geneticist
+> before any clinical decision. Do not enter patient identifiers (PHI) into this system.
+>
+> **本工具僅供研究與教育用途，不構成醫療建議或診斷依據。**
+> 所有變異分類結果應由臨床遺傳師覆核。請勿輸入可識別之病患個資（PHI）。
+
 一個面向生物資訊研究的 Web 平台，可搜尋人類基因／蛋白並產出論文等級的變異註解表格，整合 NCBI E-utilities、Ensembl VEP 與 RegulomeDB。
 
 A bioinformatics web platform that searches human genes and proteins and produces paper-quality variant annotation tables by integrating NCBI E-utilities, Ensembl VEP, and RegulomeDB.

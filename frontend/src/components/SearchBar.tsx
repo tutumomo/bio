@@ -20,8 +20,8 @@ export function SearchBar() {
 
   const placeholder =
     mode === "gene"
-      ? "Search genes or proteins (e.g., BRCA1, TP53, EGFR)..."
-      : "Search pathways (e.g., MAPK signaling, DNA repair, apoptosis)...";
+      ? "Search genes or rsIDs (e.g., BRCA1, rs80357906). Do NOT enter patient names or IDs."
+      : "Search pathways (e.g., MAPK signaling, DNA repair). Do NOT enter patient names or IDs.";
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-3">

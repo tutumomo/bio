@@ -1,6 +1,7 @@
 import { Dna, Network, Microscope } from "lucide-react";
 import { motion } from "motion/react";
 import { SearchBar } from "@/components/SearchBar";
+import { ClinicalDisclaimer } from "@/components/ClinicalDisclaimer";
 
 export function SearchPage() {
   return (
@@ -9,6 +10,7 @@ export function SearchPage() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-12"
     >
+      <ClinicalDisclaimer />
       <section className="relative rounded-[2rem] overflow-hidden p-12 lg:p-20 flex flex-col items-center justify-center min-h-[500px] text-center">
         <div className="absolute inset-0 z-0 bg-[#002045]" />
 

@@ -13,6 +13,7 @@ import { VariantTable } from "@/components/VariantTable";
 import { PathwayResultsPanel } from "@/components/PathwayResultsPanel";
 import { useVariants } from "@/hooks/useVariants";
 import { api } from "@/lib/api";
+import { ClinicalDisclaimer } from "@/components/ClinicalDisclaimer";
 import type { VariantFilters, SearchMode } from "@/types";
 
 export function ResultsPage() {
@@ -100,6 +101,7 @@ export function ResultsPage() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+      <ClinicalDisclaimer />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

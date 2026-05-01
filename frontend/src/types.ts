@@ -27,6 +27,14 @@ export interface Variant {
   regulome_rank: string | null;
   protein_position: string | null;
   amino_acid_change: string | null;
+  hgvsc: string | null;
+  hgvsp: string | null;
+  clinvar_significance: string | null;
+  clinvar_review_stars: number | null;
+  gnomad_af_popmax: number | null;
+  acmg_tier: string | null;
+  acmg_evidence_codes: string[] | null;
+  acmg_rationale: string | null;
   dbsnp_url: string | null;
   ensembl_vep_url: string | null;
 }
