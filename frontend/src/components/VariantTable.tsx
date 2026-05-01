@@ -12,6 +12,7 @@ import type { Variant } from "@/types";
 import { ImpactBadge } from "./ImpactBadge";
 import { CaddScoreBar } from "./CaddScoreBar";
 import { SourceLinkButtons } from "./SourceLinkButtons";
+import { AcmgEvidencePopover } from "./AcmgEvidencePopover";
 import { exportCSV } from "@/lib/export";
 
 const columnHelper = createColumnHelper<Variant>();
@@ -22,12 +23,17 @@ export function VariantTable({ variants }: { variants: Variant[] }) {
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const handleExportCSV = () => {
-    const headers = ["RSID", "Gene", "Consequence", "Impact", "CADD", "GERP++", "RegulomeDB"];
+    const headers = ["RSID", "Gene", "Consequence", "Impact", "HGVS c.", "ClinVar", "gnomAD AF popmax", "ACMG Tier", "ACMG Evidence", "CADD", "GERP++", "RegulomeDB"];
     const rows = variants.map((v) => [
       v.rsid || "N/A",
       v.gene_symbol || "N/A",
       v.consequence ?? "N/A",
       v.impact ?? "N/A",
+      v.hgvsc ?? "N/A",
+      v.clinvar_significance ?? "N/A",
+      v.gnomad_af_popmax?.toString() ?? "N/A",
+      v.acmg_tier ?? "N/A",
+      v.acmg_evidence_codes?.join(";") ?? "N/A",
       v.cadd_score?.toString() ?? "N/A",
       v.gerp_score?.toString() ?? "N/A",
       v.regulome_rank ?? "N/A",
@@ -59,6 +65,52 @@ export function VariantTable({ variants }: { variants: Variant[] }) {
         header: "Impact",
         cell: (info) => <ImpactBadge impact={info.getValue()} />,
         size: 100,
+      }),
+      columnHelper.accessor("hgvsc", {
+        header: "HGVS c.",
+        cell: (info) => (
+          <span className="block max-w-[220px] truncate font-mono text-[11px] text-slate-600 dark:text-slate-300" title={info.getValue() ?? undefined}>
+            {info.getValue() ?? "N/A"}
+          </span>
+        ),
+        size: 220,
+      }),
+      columnHelper.accessor("clinvar_significance", {
+        header: "ClinVar",
+        cell: (info) => {
+          const value = info.getValue();
+          const stars = info.row.original.clinvar_review_stars ?? 0;
+          return (
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              {value ?? "N/A"}
+              {value ? <span className="ml-1 font-mono text-amber-600 dark:text-amber-300">{"*".repeat(stars)}</span> : null}
+            </span>
+          );
+        },
+        size: 190,
+      }),
+      columnHelper.accessor("gnomad_af_popmax", {
+        header: "gnomAD AF",
+        cell: (info) => {
+          const value = info.getValue();
+          return (
+            <span className="font-mono text-xs text-slate-600 dark:text-slate-400">
+              {value == null ? "N/A" : value < 0.001 ? value.toExponential(2) : value.toFixed(4)}
+            </span>
+          );
+        },
+        size: 110,
+      }),
+      columnHelper.accessor("acmg_tier", {
+        header: "ACMG",
+        cell: (info) => (
+          <AcmgEvidencePopover
+            tier={info.getValue()}
+            codes={info.row.original.acmg_evidence_codes}
+            rationale={info.row.original.acmg_rationale}
+          />
+        ),
+        size: 150,
       }),
       columnHelper.accessor("cadd_score", {
         header: "CADD",

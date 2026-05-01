@@ -78,13 +78,20 @@ export function ResultsPage() {
     exportCSV(headers, rows, `gene_overview_${query}.csv`);
   };
 
-  const VARIANT_HEADERS = ["Gene", "rsID", "Consequence", "Impact", "CADD", "GERP++", "RegulomeDB", "Protein Position", "Amino Acid Change", "dbSNP URL", "VEP URL"];
+  const VARIANT_HEADERS = ["Gene", "rsID", "Consequence", "Impact", "HGVS c.", "HGVS p.", "ClinVar", "ClinVar Stars", "gnomAD AF popmax", "ACMG Tier", "ACMG Evidence", "CADD", "GERP++", "RegulomeDB", "Protein Position", "Amino Acid Change", "dbSNP URL", "VEP URL"];
   const variantRows = () =>
     (variantData?.variants ?? []).map((v) => [
       v.gene_symbol ?? "",
       v.rsid,
       v.consequence ?? "",
       v.impact ?? "",
+      v.hgvsc ?? "",
+      v.hgvsp ?? "",
+      v.clinvar_significance ?? "",
+      v.clinvar_review_stars?.toString() ?? "",
+      v.gnomad_af_popmax?.toString() ?? "",
+      v.acmg_tier ?? "",
+      v.acmg_evidence_codes?.join(";") ?? "",
       v.cadd_score?.toString() ?? "",
       v.gerp_score?.toString() ?? "",
       v.regulome_rank ?? "",
