@@ -7,7 +7,7 @@ import { useGeneSearch } from "@/hooks/useGeneSearch";
 import { GeneTable } from "@/components/GeneTable";
 import SkeletonTable from "@/components/SkeletonTable";
 import { ErrorState } from "@/components/ErrorState";
-import { exportCSV, exportTSV } from "@/lib/export";
+import { exportCSV, exportTSV, generateManifest, exportManifestJSON } from "@/lib/export";
 import { FilterPanel } from "@/components/FilterPanel";
 import { VariantTable } from "@/components/VariantTable";
 import { PathwayResultsPanel } from "@/components/PathwayResultsPanel";
@@ -103,6 +103,10 @@ export function ResultsPage() {
 
   const handleExportVariantsCSV = () => exportCSV(VARIANT_HEADERS, variantRows(), `variants_${query}.csv`);
   const handleExportVariantsTSV = () => exportTSV(VARIANT_HEADERS, variantRows(), `variants_${query}.tsv`);
+  const handleExportManifest = () => {
+    const manifest = generateManifest(query, filters as Record<string, unknown>);
+    exportManifestJSON(manifest, `manifest_${query}.json`);
+  };
 
   const isLoading = mode === "pathway" ? pathwayLoading : geneLoading;
 
@@ -202,6 +206,12 @@ export function ResultsPage() {
                         className="flex items-center gap-2 px-3 py-1.5 border border-slate-200 dark:border-slate-700 text-[#002045] dark:text-slate-200 text-xs font-bold rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"
                       >
                         <Download className="w-3 h-3" /> TSV
+                      </button>
+                      <button
+                        onClick={handleExportManifest}
+                        className="flex items-center gap-2 px-3 py-1.5 border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-300 text-xs font-bold rounded-lg hover:bg-violet-50 dark:hover:bg-violet-900/30"
+                      >
+                        <Download className="w-3 h-3" /> Manifest
                       </button>
                     </div>
                   </div>
