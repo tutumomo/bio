@@ -27,40 +27,52 @@ Helix Bio v2.0 upgrades the project from a gene and variant browser into a clini
 - Coding HGVS (`hgvsc`) and protein HGVS (`hgvsp`) extraction from Ensembl VEP.
 - Variant table and exports now include clinical-grade nomenclature fields.
 
+
+### OMIM Disease Associations
+
+- OMIM disease entries with inheritance pattern and age of onset displayed in Gene Detail page.
+- Orphanet rare disease cross-references linked from each OMIM entry.
+
+### Reproducibility Manifest
+
+- Each CSV/TSV export includes a companion `manifest.json` recording API versions and `accessed_at` timestamps.
+- Supports reproducibility requirements for supplementary tables in publications.
+
 ## Clinical Disclaimer
 
-> **FOR RESEARCH USE ONLY - Not for clinical diagnosis.**
+> **FOR RESEARCH USE ONLY — Not for clinical diagnosis.**
 > All variant classifications must be reviewed by a certified clinical geneticist before any clinical decision. Do not enter patient identifiers (PHI) into this system.
 
-The disclaimer is shown in the UI, README, and CSV/TSV export metadata.
+The disclaimer is shown in the UI banner, README, API response metadata, and CSV/TSV export metadata.
 
 ## Technical Changes
 
 - Backend runtime standardized on Python 3.11.
-- Added ClinVar, gnomAD, and ACMG service modules.
-- Added clinical fields to `variant_cache`.
+- Added `clinvar`, `gnomad`, `acmg_classifier`, `omim`, `orphanet` service modules.
+- Added clinical fields to `variant_cache` via two Alembic migrations.
 - Reduced Ensembl VEP batch size to 200 to match the current upstream API limit.
 - Added rate-limit handling for NCBI and throttled gnomAD batch lookups.
-- Added frontend columns for HGVS, ClinVar, gnomAD AF popmax, and ACMG tier.
+- Frontend: new VariantTable columns for HGVS, ClinVar, gnomAD AF_popmax, and ACMG tier; collapsible `AcmgEvidencePopover`; `OmimDiseasePanel` in Gene Detail page.
 
 ## Migration
 
-Run:
+Run after deploying:
 
 ```bash
 cd backend
 alembic upgrade head
 ```
 
-This adds six nullable fields to `variant_cache`: `hgvsc`, `hgvsp`, `clinvar_significance`, `clinvar_review_stars`, `gnomad_af_popmax`, and `acmg_tier`.
+This adds six nullable fields to `variant_cache`:
+- `hgvsc`, `hgvsp` (migration `7552cb4e3125`)
+- `clinvar_significance`, `clinvar_review_stars`, `gnomad_af_popmax`, `acmg_tier` (migration `453a3747ceb7`)
 
 ## Verification
 
-- Backend test suite: `64 passed, 1 warning`
+- Backend test suite: **68 passed, 1 warning**
 - Frontend typecheck: `npm run lint`
 - ACMG classifier: 12 offline rule and tier mapping tests
 
 ## Next
 
-- v2.5: OMIM disease associations, methods generation, reproducibility manifest.
-- v3.0: pharmacogenomics, batch queries, PubMed links, and protein lollipop plots.
+- v3.0: pharmacogenomics (PharmGKB/CPIC), batch gene-list queries, PubMed variant citations, protein lollipop plots.

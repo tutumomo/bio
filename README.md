@@ -1,66 +1,60 @@
-# Helix Bio — Variant Annotation System
+# Helix Bio — Variant Annotation System · v2.0.0
 
-> **FOR RESEARCH USE ONLY - Not a medical device.**
+> **FOR RESEARCH USE ONLY — Not a medical device.**
 > All variant classifications must be reviewed by a certified clinical geneticist
 > before any clinical decision. Do not enter patient identifiers (PHI) into this system.
 >
 > **本工具僅供研究與教育用途，不構成醫療建議或診斷依據。**
 > 所有變異分類結果應由臨床遺傳師覆核。請勿輸入可識別之病患個資（PHI）。
 
-一個面向生物資訊研究的 Web 平台，可搜尋人類基因／蛋白並產出論文等級的變異註解表格，整合 NCBI E-utilities、Ensembl VEP、RegulomeDB、ClinVar 與 gnomAD。
+一個面向生物資訊研究的 Web 平台，可搜尋人類基因／蛋白並產出論文等級的變異註解表格，整合 NCBI E-utilities、Ensembl VEP、RegulomeDB、ClinVar、gnomAD 與 OMIM。
 
-A bioinformatics web platform that searches human genes and proteins and produces paper-quality variant annotation tables by integrating NCBI E-utilities, Ensembl VEP, RegulomeDB, ClinVar, and gnomAD.
+A bioinformatics web platform that searches human genes and proteins and produces paper-quality variant annotation tables, integrating NCBI E-utilities, Ensembl VEP, RegulomeDB, ClinVar, gnomAD, and OMIM.
 
 ## Features / 功能特色
 
-- **Gene Discovery / 基因搜尋**
-  - 透過 NCBI E-utilities 以 gene symbol 或 protein name 搜尋基因。
-  - Search genes by symbol or protein name through NCBI E-utilities.
+### 基因與蛋白查詢 / Gene & Protein Discovery
 
-- **SNP Annotation / SNP 註解**
-  - 提供來自 Ensembl VEP、RegulomeDB、ClinVar 與 gnomAD 的 CADD、GERP++、調控分數、臨床意義與族群頻率。
-  - Retrieve CADD, GERP++, regulatory scores, clinical significance, and population frequency from Ensembl VEP, RegulomeDB, ClinVar, and gnomAD.
+- **Gene Search** — 透過 NCBI E-utilities 以 gene symbol 或 protein name 搜尋基因。Search genes by symbol or protein name via NCBI E-utilities.
+- **Disease Associations / 疾病關聯** — OMIM 疾病條目（遺傳模式、發病年齡）與 Orphanet 罕病代碼。OMIM disease entries with inheritance pattern and Orphanet cross-references.
+- **Pathway Analysis** — Reactome pathway search + STRING protein interaction partners.
+- **Tissue Expression** — GTEx RNA expression across 54 tissues.
 
-- **ACMG/AMP Evidence Summary / ACMG/AMP 證據摘要**
-  - 依自動化資料推導 PVS1、PS3、PM2、PP3、BA1、BS1、BS2、BP4、BP7 等證據碼與 preliminary 5-tier 分類。
-  - Derive preliminary ACMG/AMP 5-tier classifications and evidence codes from automated evidence.
+### 變異註解 / Variant Annotation
 
-- **HGVS Nomenclature / HGVS 命名**
-  - 顯示 coding HGVS (`hgvsc`) 與 protein HGVS (`hgvsp`) 欄位。
-  - Display coding HGVS (`hgvsc`) and protein HGVS (`hgvsp`) fields.
+- **SNP Annotation** — CADD, GERP++, regulatory scores (RegulomeDB), consequence, and impact from Ensembl VEP.
+- **ClinVar Clinical Significance / 臨床意義** — Pathogenic / Likely Pathogenic / VUS / Likely Benign / Benign，含 review star rating（0–4 星）。With review star rating (0–4 stars).
+- **gnomAD Population Frequency / 族群頻率** — gnomAD v4 `AF_popmax` 及各族群（EAS、NFE、AFR、SAS 等）頻率。gnomAD v4 AF_popmax and per-population allele frequencies.
+- **HGVS Nomenclature / 命名** — Coding (`hgvsc`) 與 protein (`hgvsp`) 標準命名。Coding and protein standard nomenclature.
+- **ACMG/AMP 5-Tier Classification / 5-tier 自動分類** — 依 ACMG/AMP 2015 Standards 自動推導 9 個證據碼（PVS1 / PS3 / PM2 / PP3 / BA1 / BS1 / BS2 / BP4 / BP7），輸出 Pathogenic / Likely Pathogenic / VUS / Likely Benign / Benign。9 evidence codes derived automatically; UI shows collapsible evidence panel per variant.
 
-- **Paper-Quality Tables / 論文級表格輸出**
-  - 產出 Gene overview（Table 2）與 variant annotations（Supplementary Table 1）格式資料。
-  - Generate gene overview (Table 2) and variant annotation (Supplementary Table 1) outputs.
+### 輸出與合規 / Export & Compliance
 
-- **Source Links / 原始資料連結**
-  - 直接連到 NCBI Gene、Ensembl、dbSNP、UniProt、ClinVar、RegulomeDB。
-  - Provide direct links to NCBI Gene, Ensembl, dbSNP, UniProt, ClinVar, and RegulomeDB.
+- **Reproducibility Manifest** — 每次匯出附帶 `manifest.json`，記錄 API 版本與查詢時間戳，滿足論文可重現性要求。Each export includes a `manifest.json` with API versions and `accessed_at` timestamps.
+- **CSV/TSV Export** — 含臨床免責聲明 metadata 行，可直接用於論文附件。Includes disclaimer metadata row; suitable for supplementary tables.
+- **Research Disclaimer** — UI 頂部 banner、CSV 匯出、API response metadata 三處同步。Synced across UI banner, CSV export, and API metadata.
 
-- **Filter Panel / 篩選面板**
-  - 依 CADD、GERP++、consequence、impact、RegulomeDB rank 進行變異篩選。
-  - Filter variants by CADD, GERP++, consequence, impact, and RegulomeDB rank.
+### 其他 / Other
 
-- **CSV/TSV Export / CSV 與 TSV 匯出**
-  - 下載可直接用於分析或整理的表格資料。
-  - Export results in CSV and TSV formats for downstream analysis.
+- **Filter Panel** — CADD、GERP++、consequence、impact、RegulomeDB rank 篩選。
+- **OAuth Authentication** — Google 與 GitHub 登入。
+- **PostgreSQL Cache** — 7 天 TTL 快取，減少外部 API 呼叫。
 
-- **OAuth Authentication / OAuth 登入**
-  - 支援 Google 與 GitHub 登入。
-  - Support Google and GitHub sign-in flows.
-
-- **PostgreSQL Cache / PostgreSQL 快取**
-  - 以 7 天 TTL 快取外部 API 結果以提升效能。
-  - Use a 7-day TTL PostgreSQL cache to improve performance and reduce upstream API calls.
+---
 
 ## Architecture / 架構
 
 ```text
 bio/
-├── frontend/     # React 19 + Vite + Tailwind v4 + TanStack Table/Query
-├── backend/      # FastAPI + SQLAlchemy + asyncpg
+├── frontend/     # React 19 + Vite + Tailwind v4 + TanStack Table/Query/Virtual
+├── backend/      # FastAPI 0.115 + SQLAlchemy 2.0 async + asyncpg + httpx
 └── README.md
 ```
+
+**Backend services** (`backend/services/`):
+`ncbi` · `ensembl` · `vep` · `regulomedb` · `clinvar` · `gnomad` · `acmg_classifier` · `omim` · `orphanet` · `reactome` · `string_db` → orchestrated by `gene_pipeline`
+
+---
 
 ## Local Development / 本機開發
 
@@ -87,9 +81,14 @@ cd backend
 python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+
 export DATABASE_URL="postgresql+asyncpg://$(whoami)@localhost:5432/helix_bio"
 export JWT_SECRET="dev-secret-key"
 export FRONTEND_URL="http://localhost:5555"
+
+# Run DB migrations (required for v2.0 schema — adds HGVS, ClinVar, gnomAD, ACMG columns)
+alembic upgrade head
+
 uvicorn backend.main:app --reload --port 8001 --host 0.0.0.0
 ```
 
@@ -101,55 +100,104 @@ npm install
 npm run dev -- --port 5555 --host 0.0.0.0
 ```
 
-Open `http://localhost:5555`
+Open `http://localhost:5555` / 開啟 `http://localhost:5555`
 
-開啟 `http://localhost:5555`
+### Run Tests / 執行測試
 
-### Environment Variables / 環境變數
+```bash
+cd backend
+PYTHONPATH=/path/to/bio pytest -q          # all 68 tests
+pytest backend/tests/test_clinvar.py -v    # single file
+pytest --cov=backend --cov-report=term-missing
+```
 
-**Backend / 後端**
+---
 
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL 連線字串 / PostgreSQL connection string (asyncpg) |
-| `JWT_SECRET` | JWT 簽章金鑰 / JWT signing key |
-| `NCBI_API_KEY` | NCBI E-utilities API key（可選，提升 rate limit / optional, increases rate limit） |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
-| `GITHUB_CLIENT_ID` | GitHub OAuth client ID |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth client secret |
-| `FRONTEND_URL` | 前端網址，用於 CORS 與 OAuth callback / Frontend URL for CORS and OAuth callbacks |
+## Environment Variables / 環境變數
 
-**Frontend / 前端**
+### Backend / 後端
 
-| Variable | Description |
-|----------|-------------|
-| `VITE_API_URL` | 後端 API base URL / Backend API base URL |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | ✅ | asyncpg PostgreSQL URL (e.g. `postgresql+asyncpg://user@host/helix_bio`) |
+| `JWT_SECRET` | ✅ | JWT signing secret（生產環境請用隨機長字串） |
+| `FRONTEND_URL` | ✅ | 前端網址，用於 CORS 與 OAuth callback（e.g. `https://helix-bio.vercel.app`） |
+| `NCBI_API_KEY` | optional | NCBI E-utilities key，提升 rate limit 從 3 → 10 req/s |
+| `OMIM_API_KEY` | optional | OMIM API key（https://omim.org/api）；未設定時 OMIM 功能 graceful skip |
+| `GOOGLE_CLIENT_ID` | optional | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | optional | Google OAuth client secret |
+| `GITHUB_CLIENT_ID` | optional | GitHub OAuth client ID |
+| `GITHUB_CLIENT_SECRET` | optional | GitHub OAuth client secret |
+
+### Frontend / 前端
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `VITE_API_URL` | production only | 後端 API base URL（dev 環境由 Vite proxy 自動轉發） |
+
+---
 
 ## Deployment / 部署
 
-**Frontend -> Vercel**
+### Frontend → Vercel
 
-- Connect the GitHub repository and set the root directory to `frontend/`.
-- Add `VITE_API_URL` to point at the Railway backend.
-- 連接 GitHub repo，並將 root directory 設為 `frontend/`。
-- 設定 `VITE_API_URL` 指向 Railway 上的後端。
+1. 連接 GitHub repo，**Root Directory** 設為 `frontend/`
+2. Framework Preset: **Vite**
+3. 設定環境變數 `VITE_API_URL` → Railway 後端網址（例如 `https://helix-bio-api.up.railway.app`）
+4. `frontend/vercel.json` 已設定 SPA rewrite 與 `/api/*` proxy，無需額外設定
 
-**Backend -> Railway**
+```json
+// frontend/vercel.json（已存在）
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://helix-bio-api.up.railway.app/api/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+```
 
-- Connect the GitHub repository and set the root directory to `backend/`.
-- Add a PostgreSQL plugin for the database.
-- Set all required backend environment variables.
-- 連接 GitHub repo，並將 root directory 設為 `backend/`。
-- 加入 PostgreSQL plugin 作為資料庫。
-- 設定所有必要的後端環境變數。
+> **更換後端網址時**：更新 `frontend/vercel.json` 中的 `destination` 與 Vercel 環境變數 `VITE_API_URL`。
+
+### Backend → Railway
+
+1. 連接 GitHub repo，**Root Directory** 設為 `backend/`
+2. 加入 **PostgreSQL plugin**（Railway 會自動注入 `DATABASE_URL`）
+3. 設定所有必要環境變數（見上表）
+4. 首次部署後執行 DB migration：
+
+```bash
+# 在 Railway console 或 deploy command 中執行
+alembic upgrade head
+```
+
+> **v2.0 新增 3 個 migration**，若從 v1.x 升級必須執行：
+> - `7552cb4e3125` — 新增 `hgvsc`, `hgvsp` 欄位
+> - `453a3747ceb7` — 新增 `clinvar_significance`, `clinvar_review_stars`, `gnomad_af_popmax`, `acmg_tier` 欄位
+
+**Railway start command**（`backend/Procfile` 已設定）：
+
+```
+web: uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}
+```
+
+---
 
 ## Tech Stack / 技術棧
 
 | Layer | Technology |
 |-------|-----------|
 | Frontend / 前端 | React 19, Vite, Tailwind v4, TanStack Table/Query/Virtual, React Router v6 |
-| Backend / 後端 | FastAPI, SQLAlchemy 2.0, asyncpg, httpx |
-| Database / 資料庫 | PostgreSQL 16 |
+| Backend / 後端 | FastAPI 0.115, SQLAlchemy 2.0, asyncpg, httpx, slowapi |
+| Database / 資料庫 | PostgreSQL 16 (7-day cache TTL) |
 | Auth / 驗證 | OAuth 2.0 (Google, GitHub) + JWT |
-| External APIs / 外部 API | NCBI E-utilities, Ensembl VEP, RegulomeDB, ClinVar, gnomAD |
+| External APIs | NCBI E-utilities, Ensembl VEP, RegulomeDB, ClinVar (NCBI), gnomAD v4 GraphQL, OMIM, Orphanet |
+
+---
+
+## Version History / 版本歷史
+
+| Version | Date | Highlights |
+|---------|------|-----------|
+| v1.0.0 | 2026-03 | Initial release: gene search, VEP annotation, pathway analysis |
+| v1.2.0 | 2026-04 | PostgreSQL cache, rate limiting, OAuth, search history |
+| **v2.0.0** | **2026-05** | **ClinVar · gnomAD v4 · ACMG/AMP 5-tier · HGVS · OMIM · Orphanet · Reproducibility manifest** |
