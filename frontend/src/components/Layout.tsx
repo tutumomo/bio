@@ -20,7 +20,7 @@ export function Layout() {
         <div className="mb-10 px-2">
           <h2 className="font-extrabold text-[#002045] dark:text-slate-100 text-xl tracking-tight">Helix Bio</h2>
           <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mt-1">
-            Variant Annotation v1.0
+            Clinical-Grade Variant Annotation v2.0
           </p>
         </div>
 
