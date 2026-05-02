@@ -11,6 +11,7 @@ class OmimDisease(BaseModel):
     description: str = ""
     inheritance: Optional[str] = None
     last_updated: Optional[str] = None
+    orphanet_url: Optional[str] = None
 
 
 class OmimDiseaseResult(BaseModel):
@@ -18,3 +19,4 @@ class OmimDiseaseResult(BaseModel):
     diseases: List[OmimDisease]
     total: int
     omim_search_url: str
+    orpha_search_url: str

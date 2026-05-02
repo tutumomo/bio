@@ -54,6 +54,17 @@ function OmimDiseaseCard({ disease }: { disease: OmimDisease }) {
             Chr {disease.chromosome}
           </span>
         )}
+        {disease.orphanet_url && (
+          <a
+            href={disease.orphanet_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-800 hover:bg-violet-100 dark:hover:bg-violet-900/50 transition-colors"
+          >
+            Orphanet
+          </a>
+        )}
       </div>
     </a>
   );
@@ -76,14 +87,24 @@ export function OmimDiseasePanel({ geneSymbol }: { geneSymbol: string }) {
           </span>
         </h3>
         {data && (
-          <a
-            href={data.omim_search_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            View on OMIM
-          </a>
+          <div className="flex items-center gap-3">
+            <a
+              href={data.omim_search_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              View on OMIM
+            </a>
+            <a
+              href={data.orpha_search_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:underline"
+            >
+              Search on Orphanet
+            </a>
+          </div>
         )}
       </div>
 

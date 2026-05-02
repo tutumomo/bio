@@ -146,6 +146,7 @@ export interface OmimDisease {
   description: string;
   inheritance: string | null;
   last_updated: string | null;
+  orphanet_url: string | null;
 }
 
 export interface OmimDiseaseResult {
@@ -153,4 +154,5 @@ export interface OmimDiseaseResult {
   diseases: OmimDisease[];
   total: number;
   omim_search_url: string;
+  orpha_search_url: string;
 }

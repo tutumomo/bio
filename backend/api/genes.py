@@ -12,6 +12,7 @@ from backend.schemas.string_partner import StringPartner, StringPartnersResult
 from backend.services.gene_pipeline import GenePipeline
 from backend.services.string_db import StringDBClient
 from backend.services.omim import OmimClient
+from backend.services.orphanet import orpha_search_url
 from backend.auth.dependencies import get_optional_user, check_query_limit, record_search_history
 from backend.models.user import User
 from backend.schemas.omim import OmimDisease, OmimDiseaseResult
@@ -113,10 +114,18 @@ async def get_omim_diseases(
 ):
     """Fetch OMIM disease associations for a gene."""
     diseases_raw = await omim_client.get_diseases_for_gene(gene_symbol, limit=limit)
-    diseases = [OmimDisease(**d) for d in diseases_raw]
+    diseases = []
+    for d in diseases_raw:
+        mim = d.get("mim_number")
+        d["orphanet_url"] = (
+            f"https://www.orpha.net/en/disease/search?search=OMIM:{mim}"
+            if mim else None
+        )
+        diseases.append(OmimDisease(**d))
     return OmimDiseaseResult(
         gene_symbol=gene_symbol,
         diseases=diseases,
         total=len(diseases),
         omim_search_url=f"https://omim.org/search?search={gene_symbol}",
+        orpha_search_url=orpha_search_url(gene_symbol),
     )
